@@ -4,6 +4,9 @@ import 'tabs/FirstTab.dart';
 import 'tabs/SecondTab.dart';
 import 'tabs/quiz.dart';
 import 'tabs/mypage.dart';
+import 'package:provider/provider.dart';
+import 'usercontroller.dart';
+import 'login_sucess.dart';
 
 void main() {
   KakaoSdk.init(nativeAppKey: '6a66458b053d4febe1f04149328dab02');
@@ -15,13 +18,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => UserController(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          useMaterial3: true,
+        ),
+    initialRoute: '/',
+    routes: {
+    '/': (context) => const HomePage(),
+    '/loginSuccess': (context) => const LoginSuccessPage(),}
       ),
-      home: const HomePage(),
     );
   }
 }
