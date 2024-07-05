@@ -1,4 +1,4 @@
-name: madcamp_week0
+name: kaist_week2
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -11,12 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  flutter_sound: ^9.1.10
+  flutter_sound: ^9.7.0
   http: ^0.13.3
   path_provider: ^2.0.11
   permission_handler: ^10.2.0  # 권한 요청 패키지 추가
   intl: ^0.17.0  # 날짜 형식을 위한 패키지 추가
   table_calendar: ^3.0.0  # 달력 기능을 위한 패키지 추가
+  package_info_plus: ^8.0.0
+  kakao_flutter_sdk: ^1.7.0
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +27,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/image/kakao_login_large_wide.png

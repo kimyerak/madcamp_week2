@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'tabs/contact.dart';
-import 'tabs/collection.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'tabs/FirstTab.dart';
+import 'tabs/SecondTab.dart';
 import 'tabs/quiz.dart';
 import 'tabs/mypage.dart';
 
 void main() {
+  KakaoSdk.init(nativeAppKey: '6a66458b053d4febe1f04149328dab02');
   runApp(const MyApp());
 }
 
