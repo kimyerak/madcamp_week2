@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaist_week2/speech_recognition_service.dart';
+import 'package:madcamp_week2/Tabs/speech_recognition.dart';
 import 'package:intl/intl.dart'; // 날짜 형식을 위한 패키지 추가
 
 class FirstTab extends StatefulWidget {
