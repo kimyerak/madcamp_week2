@@ -21,7 +21,7 @@ dependencies:
   permission_handler: ^11.3.1  # 권한 요청 패키지 추가
   intl: ^0.19.0  # 날짜 형식을 위한 패키지 추가
   table_calendar: ^3.0.0  # 달력 기능을 위한 패키지 추가
-
+  shared_preferences: ^2.0.6
   provider: ^6.1.2  # 워드 클라우드 위한 것들
   text_analysis: ^1.0.0+2
   mongo_dart: ^0.10.3

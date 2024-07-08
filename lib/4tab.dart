@@ -21,8 +21,8 @@ class _MainTabsPageState extends State<MainTabsPage> {
   void initState() {
     super.initState();
     _widgetOptions = <Widget>[
-      FirstTab(),
-      SecondTab(),
+      FirstTab(user: widget.user),
+      SecondTab(user: widget.user),
       DashboardPage(),
       MyPage(user: widget.user), // 사용자 정보를 MyPage에 전달
     ];
@@ -37,9 +37,9 @@ class _MainTabsPageState extends State<MainTabsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Main Tabs Page'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Main Tabs Page'),
+      // ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

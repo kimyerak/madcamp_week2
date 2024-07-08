@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:madcamp_week2/api/user_api.dart';
 
 class SecondTab extends StatefulWidget {
+  final GoogleSignInAccount user;
+
+  SecondTab({required this.user});
   @override
   _SecondTabState createState() => _SecondTabState();
 }
@@ -9,15 +14,45 @@ class SecondTab extends StatefulWidget {
 class _SecondTabState extends State<SecondTab> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<String>> _events = {
-    DateTime(2023, 7, 5): ['Task 1', 'Task 2'],
-    DateTime(2023, 7, 7): ['Task 3'],
-  };
+  Map<DateTime, List<String>> _todosByDate = {};
 
-  List<String> _getEventsForDay(DateTime day) {
-    return _events[day] ?? [];
+  List<String> _getTodosForDay(DateTime day) {
+    return _todosByDate[day] ?? [];
   }
 
+  void _fetchTodosForSelectedDay(DateTime day) async {
+    try {
+      List<String> todos = await getTodosByDate(widget.user.displayName!, day);
+      setState(() {
+        _todosByDate[day] = todos;
+      });
+      _showTodosDialog(day, todos);
+    } catch (e) {
+      print('Failed to load todos: $e');
+    }
+  }
+  void _showTodosDialog(DateTime day, List<String> todos) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Todos for ${day.toLocal()}'.split(' ')[0]),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: todos.map((todo) => Text(todo)).toList(),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,32 +73,33 @@ class _SecondTabState extends State<SecondTab> {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
+              _fetchTodosForSelectedDay(selectedDay);
             },
-            eventLoader: _getEventsForDay,
+            eventLoader: _getTodosForDay,
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
                   return Positioned(
                     right: 1,
                     bottom: 1,
-                    child: _buildEventsMarker(date, events),
+                    child: _buildTodosMarker(date, events),
                   );
                 }
                 return SizedBox();
               },
             ),
           ),
-          ..._getEventsForDay(_selectedDay ?? _focusedDay).map(
-                (event) => ListTile(
-              title: Text(event),
-            ),
-          ),
+          // ..._getTodosForDay(_selectedDay ?? _focusedDay).map(
+          //       (event) => ListTile(
+          //     title: Text(event),
+          //   ),
+          // ),
         ],
       ),
     );
   }
 
-  Widget _buildEventsMarker(DateTime date, List events) {
+  Widget _buildTodosMarker(DateTime date, List events) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
