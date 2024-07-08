@@ -3,6 +3,12 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:text_analysis/text_analysis.dart';
 import 'package:word_cloud/word_cloud.dart';
+import 'package:madcamp_week2/component/buildDailyAnalysis.dart';
+import 'package:madcamp_week2/component/buildweeklyAnalysis.dart';
+import 'package:madcamp_week2/component/buildmonthlyAnalysis.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,12 +19,34 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  Future<Map<String, double>>? wordCountsFuture;
+  List<Map<String, dynamic>> userDayTodoList = [];
+  int selectedIndex = 0;
+
 
   @override
   void initState() {
     super.initState();
-    wordCountsFuture = fetchAndSetData();
+    _loadTodoList();
+  }
+  Future<void> _loadTodoList() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/test.json');
+
+      if (!await file.exists()) {
+        final data = await rootBundle.loadString('assets/test.json');
+        await file.writeAsString(data);
+      }
+
+      final String response = await file.readAsString();
+      final data = json.decode(response)['user_day_todolist'] as List<dynamic>;
+
+      setState(() {
+        userDayTodoList = data.cast<Map<String, dynamic>>();
+      });
+    } catch (e) {
+      print('Error loading JSON: $e');
+    }
   }
 
   Future<Map<String, double>> fetchAndSetData() async {
@@ -69,38 +97,27 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('분석 Page'), // 분석 페이지 상단 제목
+        title: const Text('분석 Page'),
       ),
-      body: FutureBuilder<Map<String, double>>(
-        future: wordCountsFuture,
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // 로딩 중 표시
-          } else if (snapshot.hasError) {
-            return Center(child: Text('An error occurred!')); // 에러 발생 시 표시
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            List<Map<String, dynamic>> convertedList = snapshot.data!.entries.map((entry) {
-              return {'word': entry.key, 'value': entry.value};
-            }).toList();
-
-            WordCloudData wcdata = WordCloudData(data: convertedList);
-
-            return Center(
-              child: WordCloudView(
-                data: wcdata,
-                maxtextsize: 50,
-                mintextsize: 10,
-                mapcolor: Colors.white,
-                mapwidth: 300,
-                mapheight: 350,
-                fontWeight: FontWeight.bold,
-                colorlist: [Colors.blue, Colors.green, Colors.black],
-              ),
-            );
-          } else {
-            return Center(child: Text('No data available!'));
-          }
-        },
+      body: Column(
+        children: [
+          ToggleButtons(
+            children: [Text('일별'), Text('주별'), Text('월별')],
+            isSelected: [selectedIndex == 0, selectedIndex == 1, selectedIndex == 2],
+            onPressed: (int index) {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+          ),
+          Expanded(
+            child: selectedIndex == 0
+                ? buildDailyAnalysis(userDayTodoList)
+                : selectedIndex == 1
+                ? buildWeeklyAnalysis(userDayTodoList)
+                : buildMonthlyAnalysis(),
+          ),
+        ],
       ),
     );
   }
