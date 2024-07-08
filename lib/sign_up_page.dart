@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:madcamp_week2/api/google_signin_api.dart'; // GoogleSigninApi 클래스를 정의한 파일을 import 합니다.
+import 'package:madcamp_week2_youngminyerak0/api/google_signin_api.dart'; // GoogleSigninApi 클래스를 정의한 파일을 import 합니다.
 import '4tab.dart'; // 로그인 후 이동할 메인 페이지를 import 합니다.
 import 'package:http/http.dart' as http;
 import 'dart:convert';

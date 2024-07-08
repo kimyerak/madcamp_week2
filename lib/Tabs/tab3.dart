@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:madcamp_week2/component/buildDailyAnalysis.dart';
-import 'package:madcamp_week2/component/buildWeeklyAnalysis.dart';
-import 'package:madcamp_week2/component/buildMonthlyAnalysis.dart';
+import 'package:madcamp_week2_youngminyerak0/component/buildDailyAnalysis.dart';
+import 'package:madcamp_week2_youngminyerak0/component/buildWeeklyAnalysis.dart';
+import 'package:madcamp_week2_youngminyerak0/component/buildMonthlyAnalysis.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'dart:io';

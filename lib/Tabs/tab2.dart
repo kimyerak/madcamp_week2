@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:table_calendar/table_calendar.dart';  // TableCalendar 패키지 import
+import 'package:provider/provider.dart';  // Provider 패키지 import
+import 'package:madcamp_week2_youngminyerak0/component/todo_provider.dart';  // TodoProvider 파일 import
 
 class SecondTab extends StatefulWidget {
   @override
@@ -7,16 +9,8 @@ class SecondTab extends StatefulWidget {
 }
 
 class _SecondTabState extends State<SecondTab> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  Map<DateTime, List<String>> _events = {
-    DateTime(2023, 7, 5): ['Task 1', 'Task 2'],
-    DateTime(2023, 7, 7): ['Task 3'],
-  };
-
-  List<String> _getEventsForDay(DateTime day) {
-    return _events[day] ?? [];
-  }
+  DateTime _focusedDay = DateTime.now();  // 현재 포커스된 날짜를 저장
+  DateTime? _selectedDay;  // 선택된 날짜를 저장
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +33,9 @@ class _SecondTabState extends State<SecondTab> {
                 _focusedDay = focusedDay;
               });
             },
-            eventLoader: _getEventsForDay,
+            eventLoader: (day) {
+              return Provider.of<TodoProvider>(context).getTodosForDate(day);  // 해당 날짜의 투두 항목들을 로드하여 달력에 표시
+            },
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
@@ -53,9 +49,19 @@ class _SecondTabState extends State<SecondTab> {
               },
             ),
           ),
-          ..._getEventsForDay(_selectedDay ?? _focusedDay).map(
+          ...Provider.of<TodoProvider>(context)
+              .getTodosForDate(_selectedDay ?? _focusedDay)
+              .map(
                 (event) => ListTile(
-              title: Text(event),
+              title: Text(event['text']),
+              leading: Checkbox(
+                value: event['isChecked'],
+                onChanged: (value) {
+                  setState(() {
+                    event['isChecked'] = value;
+                  });
+                },
+              ),
             ),
           ),
         ],
