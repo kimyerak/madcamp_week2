@@ -50,12 +50,12 @@ class _MainTabsPageState extends State<MainTabsPage> {
             label: 'Voice Recognition',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Todo List',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Dash board',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
