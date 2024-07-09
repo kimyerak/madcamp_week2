@@ -87,6 +87,21 @@ Future<List<Map<String, dynamic>>> getTodosByDate(String name, DateTime date) as
     throw Exception('Failed to load todos');
   }
 }
+Future<Map<String, dynamic>> getAllTodos(String name) async {
+  final url = Uri.parse('http://143.248.228.214:3000/users/alltodos?name=$name');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    print("달력 API 호출 성공");
+    Map<String, dynamic> data = json.decode(response.body);
+    print('API 응답 데이터: $data');
+    return data;
+  } else {
+    print("달력 API 호출 실패: ${response.statusCode}");
+    throw Exception('Failed to load todos');
+  }
+}
+
 
 
 Future<List<String>> getTodosByWeek(String name, DateTime startDate) async {
