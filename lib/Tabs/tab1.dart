@@ -13,6 +13,7 @@ import 'package:madcamp_week2/component/todo_provider.dart';
 
 class FirstTab extends StatefulWidget {
   final GoogleSignInAccount user;
+
   FirstTab({required this.user});
 
   @override
@@ -21,81 +22,114 @@ class FirstTab extends StatefulWidget {
 
 class _FirstTabState extends State<FirstTab> {
   DateTime _selectedDate = DateTime.now();
-  final SpeechRecognitionService _speechRecognitionService = SpeechRecognitionService();
+  List<Map<String, dynamic>> _todoList = [];
+  final SpeechRecognitionService _speechRecognitionService =
+      SpeechRecognitionService();
+
 
   @override
   void initState() {
     super.initState();
     _loadTodoList();  // 앱 실행 시 저장된 투두리스트를 로드
+    _fetchTodosForSelectedDay(_selectedDate);
   }
 
+  //방법1. shared prefernece로 불러오기
   Future<void> _loadTodoList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();  // SharedPreferences 인스턴스 가져오기
-    String? todoListString = prefs.getString('todoList');  // 저장된 투두리스트 데이터를 JSON 형식으로 가져오기
+    SharedPreferences prefs =
+        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 가져오기
+    String? todoListString =
+        prefs.getString('todoList'); // 저장된 투두리스트 데이터를 JSON 형식으로 가져오기
     if (todoListString != null) {
-      Map<String, dynamic> todoMap = json.decode(todoListString);
-      todoMap.forEach((key, value) {
-        DateTime date = DateTime.parse(key);
-        List<Map<String, dynamic>> todos = List<Map<String, dynamic>>.from(value);
-        Provider.of<TodoProvider>(context, listen: false).setTodosForDate(date, todos);
-      });
+      Map<String, dynamic> decodedMap = json.decode(todoListString);
+      setState(() {
+        _todoList = List<Map<String, dynamic>>.from(json.decode(todoListString));
+
+         });
     }
   }
 
-  Future<void> _saveTodoList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();  // SharedPreferences 인스턴스 가져오기
-    var provider = Provider.of<TodoProvider>(context, listen: false);
-    Map<String, dynamic> todoMap = provider.todos.map((key, value) => MapEntry(key.toIso8601String(), value));
-    String todoListString = json.encode(todoMap);  // _todoList 데이터를 JSON 형식으로 변환
-    await prefs.setString('todoList', todoListString);  // 변환된 JSON 데이터를 SharedPreferences에 저장
+  //방법2. DB에서 불러오기
+  void _fetchTodosForSelectedDay(DateTime day) async {
+    try {
+      print("api함수 호출하는중");
+      List<Map<String, dynamic>> todos =
+          await getTodosByDate(widget.user.displayName!, day);
+      print("Todos fetched: $todos");
+      setState(() {
+        _todoList = todos;
+      });
+    } catch (e) {
+      print('Failed to load todos: $e');
+    }
   }
 
+  // 투두리스트를 SharedPreferences에 저장하는 메서드
+  Future<void> _saveTodoList() async {
+    SharedPreferences prefs =
+        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 가져오기
+    String todoListString = json.encode(_todoList);
+    await prefs.setString(
+        'todoList', todoListString); // 변환된 JSON 데이터를 SharedPreferences에 저장
+  }
+
+  // 선택된 날짜를 변경하는 메서드
   void _onDateChanged(DateTime newDate) {
     setState(() {
-      _selectedDate = newDate;  // _selectedDate를 새로운 날짜로 변경
+      _selectedDate = newDate; // _selectedDate를 새로운 날짜로 변경
     });
+    _fetchTodosForSelectedDay(_selectedDate);
   }
 
   Future<void> _recordAndRecognize(String type) async {
     String? filePath = await _speechRecognitionService.record();
     if (filePath != null) {
-      String? recognizedText = await _speechRecognitionService.recognizeSpeech(filePath);
+      String? recognizedText =
+          await _speechRecognitionService.recognizeSpeech(filePath);
       if (recognizedText != null) {
-        final newTodo = {'type': type, 'text': recognizedText, 'isChecked': false};
+        final newTodo = {
+          'type': type,
+          'content': recognizedText,
+          'complete': false
+        };
         setState(() {
-          Provider.of<TodoProvider>(context, listen: false).addTodoItem(_selectedDate, newTodo);
-          _saveTodoList();
+          _todoList.add({'type': type, 'content': recognizedText, 'complete': false //여기에 post 호출
         });
-        await addTodoToDB(widget.user.displayName ?? '', _selectedDate, newTodo);
+        });
+        await addTodoToDB(
+            widget.user.displayName ?? '', _selectedDate, newTodo);
+        Provider.of<TodoProvider>(context, listen: false).addTodoItem(
+            _selectedDate,
+            {'type': type, 'content': recognizedText, 'complete': false});
+        _saveTodoList();
       }
     }
   }
 
-  void _toggleCheck(DateTime date, int index) {
+  void _toggleCheck(int index) {
     setState(() {
-      Provider.of<TodoProvider>(context, listen: false).toggleCheck(date, index);
-      _saveTodoList();
+      _todoList[index]['complete'] = !_todoList[index]['complete'];
     });
+    
+    _saveTodoList();
   }
 
-  void _deleteItem(DateTime date, int index) async {
-    final item = Provider.of<TodoProvider>(context, listen: false).getTodosForDate(date)[index];
-    await deleteTodoFromDB(widget.user.displayName ?? '', date, item['text']);
+  void _deleteItem(int index) async {
+    final item = _todoList[index];
+    await deleteTodoFromDB(widget.user.displayName ?? '', _selectedDate, item['content']);
     setState(() {
-      Provider.of<TodoProvider>(context, listen: false).removeTodoItem(date, index);
-      _saveTodoList();
+      _todoList.removeAt(index);
     });
+    _saveTodoList();
   }
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<TodoProvider>(context);
-    List<Map<String, dynamic>> filteredTodoList = provider.getTodosForDate(_selectedDate);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF023047),
-        title: const Text('To-Do list', style: TextStyle(fontSize: 25, color: Colors.white)),
+        title: const Text('To-Do list',
+            style: TextStyle(fontSize: 25, color: Colors.white)),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -110,7 +144,8 @@ class _FirstTabState extends State<FirstTab> {
             },
             child: Text(
               'Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
-              style: TextStyle(fontSize: 24, decoration: TextDecoration.underline),
+              style:
+                  TextStyle(fontSize: 24, decoration: TextDecoration.underline),
             ),
           ),
           SizedBox(height: 20),
@@ -127,24 +162,31 @@ class _FirstTabState extends State<FirstTab> {
               ),
             ],
           ),
+          // ElevatedButton(
+          //   onPressed: () => _fetchTodosForSelectedDay(_selectedDate),
+          //   child: Text('DB todo 불러오기'),
+          // ),
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
-              itemCount: filteredTodoList.length,
+              itemCount: _todoList.length,
               itemBuilder: (context, index) {
-                final item = filteredTodoList[index];
+                final item = _todoList[index];
                 return GestureDetector(
-                  onLongPress: () => _deleteItem(_selectedDate, index), // 여기에서 delete 호출
+                  onLongPress: () => _deleteItem(index),
                   child: ListTile(
                     leading: Checkbox(
-                      value: item['isChecked'],
-                      onChanged: (value) => _toggleCheck(_selectedDate, index),
+                      value: item['complete'],
+                      onChanged: (value) => _toggleCheck(index),
                     ),
                     title: Text(
-                      item['text'],
+                      item['content'],
                       style: TextStyle(
-                        decoration: item['isChecked'] ? TextDecoration.lineThrough : null,
-                        color: item['type'] == 'Work' ? Colors.blue : Colors.green,
+                        decoration: item['complete']
+                            ? TextDecoration.lineThrough
+                            : null,
+                        color:
+                            item['type'] == 'Work' ? Colors.blue : Colors.green,
                       ),
                     ),
                   ),
