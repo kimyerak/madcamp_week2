@@ -1,0 +1,13 @@
+[33m4e43113[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfront_youngmin[m[33m)[m HEAD@{0}: reset: moving to ORIG_HEAD
+[33me6e4eaf[m HEAD@{1}: reset: moving to ORIG_HEAD
+[33m4e43113[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfront_youngmin[m[33m)[m HEAD@{2}: commit (merge): Merge branch 'main' of https://github.com/kimyerak/madcamp_week2 into front_youngmin
+[33me6e4eaf[m HEAD@{3}: commit: 음성아이콘 넣기 전
+[33m8b6e09b[m HEAD@{4}: commit (merge): Merge branch 'main' of https://github.com/kimyerak/madcamp_week2 into front_youngmin
+[33m719141a[m HEAD@{5}: commit: provider 망한거
+[33m65ae779[m[33m ([m[1;31morigin/front_youngmin[m[33m)[m HEAD@{6}: pull --no-stat -v --progress origin front_youngmin: Merge made by the 'ort' strategy.
+[33mbfccacc[m HEAD@{7}: reset: moving to HEAD
+[33mbfccacc[m HEAD@{8}: commit: 협업시작 진짜로
+[33mb42e5ec[m HEAD@{9}: checkout: moving from front_youngmin to front_youngmin
+[33mb42e5ec[m HEAD@{10}: commit: 협업시작
+[33m9630b3a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{11}: checkout: moving from main to front_youngmin
+[33m9630b3a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{12}: clone: from https://github.com/kimyerak/madcamp_week2.git
