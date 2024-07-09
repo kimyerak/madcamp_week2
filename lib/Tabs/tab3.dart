@@ -49,49 +49,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future<Map<String, double>> fetchAndSetData() async {
-    try {
-      final String response = await rootBundle.loadString('assets/test.json'); // JSON 파일 읽기
-      final data = await json.decode(response);
-
-      List<String> loadedTexts = [];
-
-      data['user_day_todolist'].forEach((day) {
-        day['todos'].forEach((todo) {
-          loadedTexts.add(todo['content']); // 할일 내용 추가
-        });
-      });
-
-      final wordFrequencies = await collectFrequentWords(loadedTexts, 2);
-      return wordFrequencies;
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  Future<Map<String, double>> collectFrequentWords(List<String> texts, int minFrequency) async {
-    final Map<String, double> wordFrequencies = {};
-    try {
-      for (String text in texts) {
-        final textDoc = await TextDocument.analyze(
-            sourceText: text,
-            analyzer: English.analyzer,
-            nGramRange: NGramRange(1, 1));
-        // 단어 빈도수 계산
-        textDoc.tokens.forEach((token) {
-          final word = token.term;
-          if (word.isNotEmpty && !RegExp(r'\d').hasMatch(word)) { // 숫자가 포함된 단어 제거
-            wordFrequencies[word] = ((wordFrequencies[word] ?? 0) + 1).toDouble();
-          }
-        });
-      }
-      // 최소 빈도 조건에 맞는 단어들만 남김
-      wordFrequencies.removeWhere((key, value) => value < minFrequency);
-      return wordFrequencies;
-    } catch (e) {
-      throw e;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

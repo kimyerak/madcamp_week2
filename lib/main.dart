@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sign_up_page.dart'; // SignUpPage 파일을 import 합니다.
 import 'package:madcamp_week2/component/todo_provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(
     MultiProvider(
       providers: [
@@ -12,7 +15,9 @@ void main() {
       child: const MyApp(),
     ),
   );
+  FlutterNativeSplash.remove();
 }
+
 
 
 class MyApp extends StatelessWidget {

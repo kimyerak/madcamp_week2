@@ -6,7 +6,7 @@ import 'package:madcamp_week2/Tabs/tab1.dart';
 import 'package:intl/intl.dart';
 
 Future<void> addTodoToDB(String name, DateTime date, Map<String, dynamic> todo) async {
-  final url = 'http://143.248.228.159:3000/users/todolists'; // 백엔드 API 엔드포인트
+  final url = 'http://143.248.228.214:3000/users/todolists'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'user_day_todolist': [
@@ -31,7 +31,7 @@ Future<void> addTodoToDB(String name, DateTime date, Map<String, dynamic> todo) 
 }
 
 Future<void> deleteTodoFromDB(String name, DateTime date, String content) async {
-  final url = 'http://143.248.228.159:3000/users/todolists/delete'; // 백엔드 API 엔드포인트
+  final url = 'http://143.248.228.214:3000/users/todolists/delete'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'name': name,
@@ -51,7 +51,7 @@ Future<void> deleteTodoFromDB(String name, DateTime date, String content) async 
   }}
 
 Future<List<String>> getTodosByDate(String name, DateTime date) async {
-  final url = Uri.parse('http://143.248.228.159:3000/users/todobydate?name=$name&date=${date.toIso8601String()}');
+  final url = Uri.parse('http://143.248.228.214:3000/users/todobydate?name=$name&date=${date.toIso8601String()}');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -59,5 +59,30 @@ Future<List<String>> getTodosByDate(String name, DateTime date) async {
     return List<String>.from(data.map((item) => item['content'] as String));
   } else {
     throw Exception('Failed to load todos');
+  }
+}
+
+Future<List<String>> getTodosByWeek(String name, DateTime startDate) async {
+  final endDate = startDate.add(Duration(days: 6)); // 한 주의 끝 날짜 계산
+  final url = Uri.parse('http://143.248.228.214:3000/users/todobyweek?name=$name&start_date=${startDate.toIso8601String()}&end_date=${endDate.toIso8601String()}');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    return List<String>.from(data.map((item) => item['content'] as String));
+  } else {
+    throw Exception('Failed to load weekly todos');
+  }
+}
+
+Future<List<String>> getTodosByMonth(String name, int year, int month) async {
+  final url = Uri.parse('http://143.248.228.214:3000/users/todobymonth?name=$name&year=$year&month=$month');
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    return List<String>.from(data.map((item) => item['content'] as String));
+  } else {
+    throw Exception('Failed to load monthly todos');
   }
 }
