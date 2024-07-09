@@ -14,15 +14,15 @@ class SecondTab extends StatefulWidget {
 class _SecondTabState extends State<SecondTab> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<String>> _todosByDate = {};
+  Map<DateTime, List<Map<String, dynamic>>> _todosByDate = {};
 
-  List<String> _getTodosForDay(DateTime day) {
+  List<Map<String, dynamic>> _getTodosForDay(DateTime day) {
     return _todosByDate[day] ?? [];
   }
 
   void _fetchTodosForSelectedDay(DateTime day) async {
     try {
-      List<String> todos = await getTodosByDate(widget.user.displayName!, day);
+      List<Map<String, dynamic>> todos = await getTodosByDate(widget.user.displayName!, day);
       setState(() {
         _todosByDate[day] = todos;
       });
@@ -31,15 +31,15 @@ class _SecondTabState extends State<SecondTab> {
       print('Failed to load todos: $e');
     }
   }
-  void _showTodosDialog(DateTime day, List<String> todos) {
+  void _showTodosDialog(DateTime day, List<Map<String, dynamic>> todos) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Todos for ${day.toLocal()}'.split(' ')[0]),
+          title: Text('Todo for ${day}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: todos.map((todo) => Text(todo)).toList(),
+            children: todos.map((todo) => Text(todo['content'])).toList(),
           ),
           actions: [
             TextButton(
