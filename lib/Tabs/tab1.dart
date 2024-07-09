@@ -38,6 +38,7 @@ class _FirstTabState extends State<FirstTab> {
     _fetchTodosForSelectedDay(_selectedDate);
   }
 
+  //방법1. shared prefernece로 불러오기
   Future<void> _loadTodoList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? todoListString = prefs.getString('todoList');
@@ -49,6 +50,7 @@ class _FirstTabState extends State<FirstTab> {
     }
   }
 
+  //방법2. DB에서 불러오기
   void _fetchTodosForSelectedDay(DateTime day) async {
     try {
       print("api함수 호출하는중");
@@ -62,12 +64,14 @@ class _FirstTabState extends State<FirstTab> {
     }
   }
 
+  // 투두리스트를 SharedPreferences에 저장하는 메서드
   Future<void> _saveTodoList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String todoListString = json.encode(_todoList);
     await prefs.setString('todoList', todoListString);
   }
 
+  // 선택된 날짜를 변경하는 메서드
   void _onDateChanged(DateTime newDate) {
     setState(() {
       _selectedDate = newDate;
@@ -115,12 +119,21 @@ class _FirstTabState extends State<FirstTab> {
     });
   }
 
-  void _toggleCheck(int index) {
+  void _toggleCheck(int index) async {
     setState(() {
       _todoList[index]['complete'] = !_todoList[index]['complete'];
     });
-
+    await _updateTodoStatus(_todoList[index]);
     _saveTodoList();
+  }
+
+  Future<void> _updateTodoStatus(Map<String, dynamic> todo) async {
+    print("update투두 함수가 호출됨");
+    try {
+      await updateTodoInDB(widget.user.displayName ?? '', _selectedDate, todo);
+    } catch (e) {
+      print('Failed to update todo: $e');
+    }
   }
 
   void _deleteItem(int index) async {
