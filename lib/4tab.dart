@@ -22,7 +22,7 @@ class _MainTabsPageState extends State<MainTabsPage> {
     super.initState();
     _widgetOptions = <Widget>[
       FirstTab(user: widget.user),
-      SecondTab(user: widget.user),
+      SecondTab(),
       DashboardPage(),
       MyPage(user: widget.user), // 사용자 정보를 MyPage에 전달
     ];
@@ -32,16 +32,21 @@ class _MainTabsPageState extends State<MainTabsPage> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 0) {
+      // 첫 번째 탭(FirstTab)이 선택되었을 때 데이터 로드
+      _widgetOptions[0] = FirstTab(user: widget.user);
+    } else if (index == 1) {
+      // 두 번째 탭(SecondTab)이 선택되었을 때 데이터 로드
+      _widgetOptions[1] = SecondTab();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Main Tabs Page'),
-      // ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

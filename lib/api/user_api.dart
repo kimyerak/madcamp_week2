@@ -6,7 +6,7 @@ import 'package:madcamp_week2/Tabs/tab1.dart';
 import 'package:intl/intl.dart';
 
 Future<void> addTodoToDB(String name, DateTime date, Map<String, dynamic> todo) async {
-  final url = 'http://143.248.228.159:3000/users/todolists'; // 백엔드 API 엔드포인트
+  final url = 'http://143.248.228.206:3000/users/todolists'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'user_day_todolist': [

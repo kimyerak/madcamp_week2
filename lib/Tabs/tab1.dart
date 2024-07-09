@@ -20,9 +20,7 @@ class FirstTab extends StatefulWidget {
 }
 
 class _FirstTabState extends State<FirstTab> {
-
   DateTime _selectedDate = DateTime.now();
-  List<Map<String, dynamic>> _todoList = [];
   final SpeechRecognitionService _speechRecognitionService = SpeechRecognitionService();
 
   @override
@@ -35,68 +33,69 @@ class _FirstTabState extends State<FirstTab> {
     SharedPreferences prefs = await SharedPreferences.getInstance();  // SharedPreferences 인스턴스 가져오기
     String? todoListString = prefs.getString('todoList');  // 저장된 투두리스트 데이터를 JSON 형식으로 가져오기
     if (todoListString != null) {
-
-      setState(() {
-        _todoList = List<Map<String, dynamic>>.from(json.decode(todoListString));  // JSON 데이터를 Map 리스트로 변환하여 _todoList에 저장
+      Map<String, dynamic> todoMap = json.decode(todoListString);
+      todoMap.forEach((key, value) {
+        DateTime date = DateTime.parse(key);
+        List<Map<String, dynamic>> todos = List<Map<String, dynamic>>.from(value);
+        Provider.of<TodoProvider>(context, listen: false).setTodosForDate(date, todos);
       });
     }
   }
 
-  // 투두리스트를 SharedPreferences에 저장하는 메서드
   Future<void> _saveTodoList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();  // SharedPreferences 인스턴스 가져오기
-    String todoListString = json.encode(_todoList);  // _todoList 데이터를 JSON 형식으로 변환
+    var provider = Provider.of<TodoProvider>(context, listen: false);
+    Map<String, dynamic> todoMap = provider.todos.map((key, value) => MapEntry(key.toIso8601String(), value));
+    String todoListString = json.encode(todoMap);  // _todoList 데이터를 JSON 형식으로 변환
     await prefs.setString('todoList', todoListString);  // 변환된 JSON 데이터를 SharedPreferences에 저장
   }
 
-  // 선택된 날짜를 변경하는 메서드
   void _onDateChanged(DateTime newDate) {
     setState(() {
       _selectedDate = newDate;  // _selectedDate를 새로운 날짜로 변경
     });
   }
 
-
   Future<void> _recordAndRecognize(String type) async {
     String? filePath = await _speechRecognitionService.record();
     if (filePath != null) {
       String? recognizedText = await _speechRecognitionService.recognizeSpeech(filePath);
       if (recognizedText != null) {
-        final newTodo = {'type': type, 'content': recognizedText, 'complete': false};
+        final newTodo = {'type': type, 'text': recognizedText, 'isChecked': false};
         setState(() {
-          _todoList.add({'type': type, 'text': recognizedText, 'isChecked': false});
-          //여기에 post 호출
+          Provider.of<TodoProvider>(context, listen: false).addTodoItem(_selectedDate, newTodo);
+          _saveTodoList();
         });
         await addTodoToDB(widget.user.displayName ?? '', _selectedDate, newTodo);
-        Provider.of<TodoProvider>(context, listen: false).addTodoItem(_selectedDate, {'type': type, 'text': recognizedText, 'isChecked': false});
-        _saveTodoList();
       }
     }
   }
 
-  void _toggleCheck(int index) {
+  void _toggleCheck(DateTime date, int index) {
     setState(() {
-      _todoList[index]['isChecked'] = !_todoList[index]['isChecked'];
+      Provider.of<TodoProvider>(context, listen: false).toggleCheck(date, index);
+      _saveTodoList();
     });
-    _saveTodoList();
   }
 
-  void _deleteItem(int index) async{
-    final item = _todoList[index];
-    await deleteTodoFromDB(widget.user.displayName ?? '', _selectedDate, item['text']);
+  void _deleteItem(DateTime date, int index) async {
+    final item = Provider.of<TodoProvider>(context, listen: false).getTodosForDate(date)[index];
+    await deleteTodoFromDB(widget.user.displayName ?? '', date, item['text']);
     setState(() {
-      _todoList.removeAt(index);
+      Provider.of<TodoProvider>(context, listen: false).removeTodoItem(date, index);
+      _saveTodoList();
     });
-    _saveTodoList();
   }
-
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<TodoProvider>(context);
+    List<Map<String, dynamic>> filteredTodoList = provider.getTodosForDate(_selectedDate);
+
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Color(0xFF023047),
-          title: const Text('To-Do list', style:TextStyle(fontSize:25, color: Colors.white)),
+        backgroundColor: Color(0xFF023047),
+        title: const Text('To-Do list', style: TextStyle(fontSize: 25, color: Colors.white)),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,15 +130,15 @@ class _FirstTabState extends State<FirstTab> {
           SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
-              itemCount: _todoList.length,
+              itemCount: filteredTodoList.length,
               itemBuilder: (context, index) {
-                final item = _todoList[index];
+                final item = filteredTodoList[index];
                 return GestureDetector(
-                  onLongPress: () => _deleteItem(index), //여기에서 delete 호출
+                  onLongPress: () => _deleteItem(_selectedDate, index), // 여기에서 delete 호출
                   child: ListTile(
                     leading: Checkbox(
                       value: item['isChecked'],
-                      onChanged: (value) => _toggleCheck(index),
+                      onChanged: (value) => _toggleCheck(_selectedDate, index),
                     ),
                     title: Text(
                       item['text'],
@@ -153,10 +152,8 @@ class _FirstTabState extends State<FirstTab> {
               },
             ),
           ),
-
         ],
       ),
     );
   }
-
 }
