@@ -50,6 +50,29 @@ Future<void> deleteTodoFromDB(String name, DateTime date, String content) async 
     print('Error deleting todo: $e');
   }}
 
+Future<void> updateTodoInDB(String name, DateTime date, Map<String, dynamic> todo) async {
+  final url = 'http://143.248.228.214:3000/users/todolists/update'; // 백엔드 API 엔드포인트
+  final headers = {'Content-Type': 'application/json'};
+  final body = json.encode({
+    'name': name,
+    'date': DateFormat('yyyy-MM-dd').format(date),
+    'content': todo['content'],
+    'complete': todo['complete'],
+  });
+
+  try {
+    final response = await http.post(Uri.parse(url), headers: headers, body: body);
+    if (response.statusCode == 200) {
+      print('Updated todo successfully');
+    } else {
+      print('Failed to update todo: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error updating todo: $e');
+  }
+}
+
+
 Future<List<Map<String, dynamic>>> getTodosByDate(String name, DateTime date) async {
   final formattedDate = DateFormat('yyyy-MM-dd').format(date);
   final url = Uri.parse('http://143.248.228.214:3000/users/todobydate?name=$name&date=$formattedDate');
