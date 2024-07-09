@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:madcamp_week2/api/user_api.dart';
+import 'package:intl/intl.dart';
 
 class SecondTab extends StatefulWidget {
   final GoogleSignInAccount user;
@@ -14,41 +15,110 @@ class SecondTab extends StatefulWidget {
 class _SecondTabState extends State<SecondTab> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<Map<String, dynamic>>> _todosByDate = {};
+  // Map<DateTime, List<Map<String, dynamic>>> _todosByDate = {};
+  List<Map<String, dynamic>> _todoList = [];
 
   List<Map<String, dynamic>> _getTodosForDay(DateTime day) {
-    return _todosByDate[day] ?? [];
+    return _todoList.where((todo) => isSameDay(todo['date'], day)).toList();
   }
-
+//방법2. DB에서 불러오기로만 구현
   void _fetchTodosForSelectedDay(DateTime day) async {
     try {
-      List<Map<String, dynamic>> todos = await getTodosByDate(widget.user.displayName!, day);
+      print("api함수 호출하는중");
+      List<Map<String, dynamic>> todos =
+      await getTodosByDate(widget.user.displayName!, day);
+      print("Todos fetched: $todos");
       setState(() {
-        _todosByDate[day] = todos;
+        _todoList = todos;
       });
       _showTodosDialog(day, todos);
     } catch (e) {
       print('Failed to load todos: $e');
     }
   }
+  // void _fetchTodosForSelectedDay(DateTime day) async {
+  //   try {
+  //     List<Map<String, dynamic>> todos = await getTodosByDate(widget.user.displayName!, day);
+  //     setState(() {
+  //       _todosByDate[day] = todos;
+  //     });
+  //     _showTodosDialog(day, todos);
+  //   } catch (e) {
+  //     print('Failed to load todos: $e');
+  //   }
+  // }
+  void _toggleCheck(int index, Function updateState ) async {
+    updateState(() {
+      _todoList[index]['complete'] = !_todoList[index]['complete'];
+    });
+    await _updateTodoStatus(_todoList[index]);
+
+  }
+  Future<void> _updateTodoStatus(Map<String, dynamic> todo) async {
+    print("update투두 함수가 호출됨");
+    try {
+      await updateTodoInDB(widget.user.displayName ?? '', _selectedDay!, todo);
+    } catch (e) {
+      print('Failed to update todo: $e');
+    }
+  }
   void _showTodosDialog(DateTime day, List<Map<String, dynamic>> todos) {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('Todo for ${day}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: todos.map((todo) => Text(todo['content'])).toList(),
-          ),
-          actions: [
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Todo for ${DateFormat('yyyy-MM-dd').format(day)}'),
+              // content: Column(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: todos.map((todo) => Text(todo['content'])).toList(),
+              // ),
+              content: Container(
+                width: double.maxFinite,
+                height: 400,
+                child: ListView.builder(
+                  itemCount: _todoList.length,
+                  itemBuilder: (context, index) {
+                    final item = _todoList[index];
+                    return ListTile(
+                      leading: Checkbox(
+                        value: item['complete'],
+                        onChanged: (value) {
+                          setState(() {
+                            item['complete'] = value;
+                          });
+                          _toggleCheck(index, (updateState) {
+                            setState(() {
+                              _todoList[index]['complete'] = value;
+                            });
+                          });
+                        }
+                      ),
+                      title: Text(
+                        item['content'],
+                        style: TextStyle(
+                          decoration: item['complete']
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color:
+                          item['type'] == 'Work' ? Colors.blue : Colors.green,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          }
         );
       },
     );

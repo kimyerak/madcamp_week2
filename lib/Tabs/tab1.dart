@@ -106,12 +106,21 @@ class _FirstTabState extends State<FirstTab> {
     }
   }
 
-  void _toggleCheck(int index) {
+  void _toggleCheck(int index) async {
     setState(() {
       _todoList[index]['complete'] = !_todoList[index]['complete'];
     });
-    
+    await _updateTodoStatus(_todoList[index]);
     _saveTodoList();
+  }
+
+  Future<void> _updateTodoStatus(Map<String, dynamic> todo) async {
+    print("update투두 함수가 호출됨");
+    try {
+      await updateTodoInDB(widget.user.displayName ?? '', _selectedDate, todo);
+    } catch (e) {
+      print('Failed to update todo: $e');
+    }
   }
 
   void _deleteItem(int index) async {
