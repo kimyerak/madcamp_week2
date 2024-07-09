@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';  // TableCalendar 패키지 import
 import 'package:provider/provider.dart';  // Provider 패키지 import
 import 'package:madcamp_week2_youngminyerak0/component/todo_provider.dart';  // TodoProvider 파일 import
@@ -32,6 +33,7 @@ class _SecondTabState extends State<SecondTab> {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
               });
+              _showTodoDialog(selectedDay);
             },
             eventLoader: (day) {
               return Provider.of<TodoProvider>(context).getTodosForDate(day);  // 해당 날짜의 투두 항목들을 로드하여 달력에 표시
@@ -49,23 +51,51 @@ class _SecondTabState extends State<SecondTab> {
               },
             ),
           ),
-          ...Provider.of<TodoProvider>(context)
-              .getTodosForDate(_selectedDay ?? _focusedDay)
-              .map(
-                (event) => ListTile(
-              title: Text(event['text']),
-              leading: Checkbox(
-                value: event['isChecked'],
-                onChanged: (value) {
-                  setState(() {
-                    event['isChecked'] = value;
-                  });
-                },
-              ),
-            ),
-          ),
         ],
       ),
+    );
+  }
+
+  void _showTodoDialog(DateTime date) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        List<Map<String, dynamic>> todos = Provider.of<TodoProvider>(context, listen: false).getTodosForDate(date);
+        return AlertDialog(
+          title: Text('To-do List for ${DateFormat('yyyy-MM-dd').format(date)}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                final item = todos[index];
+                return ListTile(
+                  title: Text(
+                    item['text'],
+                    style: TextStyle(
+                      decoration: item['isChecked'] ? TextDecoration.lineThrough : null,  // 체크된 항목은 취소선 표시
+                      color: item['type'] == 'Work' ? Colors.blue : Colors.green,  // 타입에 따라 글자 색상 변경
+                    ),
+                  ),
+                  leading: Checkbox(
+                    value: item['isChecked'],
+                    onChanged: null,  // 체크박스를 비활성화하여 수정할 수 없도록 함
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();  // 다이얼로그 닫기
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 

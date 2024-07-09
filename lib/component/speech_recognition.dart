@@ -3,7 +3,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:permission_handler/permission_handler.dart'; // 권한 요청을 위한 패키지 추가
+import 'package:permission_handler/permission_handler.dart';
 
 class SpeechRecognitionService {
   final String clientId = 'su4sagbgqy';
@@ -11,33 +11,38 @@ class SpeechRecognitionService {
 
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _isRecorderInitialized = false;
+  bool _isRecording = false;
 
-  // 녹음기를 초기화하는 함수
-  Future<void> initRecorder() async {
-    // 마이크 권한 요청
-    if (await Permission.microphone.request().isGranted) {
-      await _recorder.openRecorder();
-      _isRecorderInitialized = true;
-    } else {
-      throw RecordingPermissionException("Microphone permission not granted");
+  Future<void> _initRecorder() async {
+    if (!_isRecorderInitialized) {
+      if (await Permission.microphone.request().isGranted) {
+        await _recorder.openRecorder();
+        _isRecorderInitialized = true;
+      } else {
+        throw RecordingPermissionException("Microphone permission not granted");
+      }
     }
   }
 
-  // 음성을 녹음하는 함수
   Future<String?> record() async {
-    if (!_isRecorderInitialized) await initRecorder();
+    await _initRecorder();
 
     Directory tempDir = await getTemporaryDirectory();
     String filePath = '${tempDir.path}/temp.wav';
 
     await _recorder.startRecorder(toFile: filePath);
-    await Future.delayed(Duration(seconds: 5)); // 5초 동안 녹음
-    await _recorder.stopRecorder();
+    _isRecording = true;
 
     return filePath;
   }
 
-  // 녹음된 음성을 클로바 API로 전송하여 텍스트로 변환하는 함수
+  Future<void> stopRecording() async {
+    if (_isRecording) {
+      await _recorder.stopRecorder();
+      _isRecording = false;
+    }
+  }
+
   Future<String?> recognizeSpeech(String filePath) async {
     File audioFile = File(filePath);
     List<int> audioBytes = audioFile.readAsBytesSync();
