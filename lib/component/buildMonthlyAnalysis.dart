@@ -70,7 +70,7 @@ Widget buildMonthlyAnalysis() {
             data: wcdata,
             maxtextsize: 50,
             mintextsize: 10,
-            mapcolor: Colors.white,
+            mapcolor: Color(0x33FFFFFF), // 여기에서 배경색 설정
             mapwidth: 300,
             mapheight: 350,
             fontWeight: FontWeight.bold,

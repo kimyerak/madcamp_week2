@@ -22,7 +22,7 @@ class _MainTabsPageState extends State<MainTabsPage> {
     super.initState();
     _widgetOptions = <Widget>[
       FirstTab(user: widget.user),
-      SecondTab(),
+      SecondTab(user: widget.user),
       DashboardPage(),
       MyPage(user: widget.user), // 사용자 정보를 MyPage에 전달
     ];
@@ -32,21 +32,16 @@ class _MainTabsPageState extends State<MainTabsPage> {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 0) {
-      // 첫 번째 탭(FirstTab)이 선택되었을 때 데이터 로드
-      _widgetOptions[0] = FirstTab(user: widget.user);
-    } else if (index == 1) {
-      // 두 번째 탭(SecondTab)이 선택되었을 때 데이터 로드
-      _widgetOptions[1] = SecondTab();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _widgetOptions,
+      // appBar: AppBar(
+      //   title: Text('Main Tabs Page'),
+      // ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -55,14 +50,17 @@ class _MainTabsPageState extends State<MainTabsPage> {
             label: 'Voice Recognition',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Color(0xFF023047),
             icon: Icon(Icons.calendar_today),
             label: 'Calendar',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Color(0xFF023047),
             icon: Icon(Icons.list),
             label: 'Dash board',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Color(0xFF023047),
             icon: Icon(Icons.person),
             label: 'My Page',
           ),
@@ -71,6 +69,7 @@ class _MainTabsPageState extends State<MainTabsPage> {
         selectedItemColor: Colors.green[800],
         unselectedItemColor: Colors.green[200],
         onTap: _onItemTapped,
+         // 네비게이션 바의 배경색 설정
       ),
     );
   }

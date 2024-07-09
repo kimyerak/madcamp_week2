@@ -57,8 +57,13 @@ class _SecondTabState extends State<SecondTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        backgroundColor: Color(0xFF023047),
+        title: const Text(
+          'Calender',
+          style: TextStyle(color: Colors.green),
+        ),
       ),
+      backgroundColor: Color(0xFF004FA0),
       body: Column(
         children: [
           TableCalendar(

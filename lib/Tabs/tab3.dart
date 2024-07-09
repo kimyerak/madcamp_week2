@@ -54,8 +54,13 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('분석 Page'),
+        backgroundColor: Color(0xFF023047),
+        title: const Text(
+          'Analyze',
+          style: TextStyle(color: Colors.green),
+        ),
       ),
+      backgroundColor: Color(0xFF004FA0),
       body: Column(
         children: [
           ToggleButtons(

@@ -11,8 +11,9 @@ class MyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Color(0xFF023047),
-          title: const Text('Setting', style:TextStyle(fontSize:25, color: Colors.white)),
+          title: const Text('My Profile', style:TextStyle(fontSize:25, color: Colors.green)),
       ),
+      backgroundColor: Color(0xFF004FA0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
