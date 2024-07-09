@@ -115,8 +115,8 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF023047),
-        title: Text('Sign Up Page', style: TextStyle(color: Colors.green),),
+        backgroundColor: Color(0xFF004FA0),
+        title: Text('Sign Up Page', style: TextStyle(color: Colors.white),),
       ),
       backgroundColor: Color(0xFF004FA0),
       body: Center(

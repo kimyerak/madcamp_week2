@@ -10,6 +10,7 @@ import 'package:madcamp_week2/api/user_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:madcamp_week2/component/todo_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class FirstTab extends StatefulWidget {
   final GoogleSignInAccount user;
@@ -21,6 +22,7 @@ class FirstTab extends StatefulWidget {
 }
 
 class _FirstTabState extends State<FirstTab> {
+
   DateTime _selectedDate = DateTime.now();
   List<Map<String, dynamic>> _todoList = [];
   final SpeechRecognitionService _speechRecognitionService = SpeechRecognitionService();
@@ -130,31 +132,58 @@ class _FirstTabState extends State<FirstTab> {
     _saveTodoList();
   }
 
+  void _showDatePicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: _selectedDate,
+            onDateTimeChanged: (DateTime newDate) {
+              _onDateChanged(newDate);
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF023047),
+        backgroundColor: Color(0xFF004FA0),
         title: const Text('To-Do-Listener',
-            style: TextStyle(fontSize: 25, color: Colors.green)),
+            style: TextStyle(fontSize: 25, color: Colors.white)),
         actions: [
-          ToggleButtons(
-            children: [
-              Text(
-                'My',
-                style: TextStyle(color: _isMySelected ? Colors.pink : Color(0xFFADD8E6)),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0), // 왼쪽으로 패딩 추가
+            child: Container(
+              width: 100.0, // 원하는 가로 길이로 조정
+              height: 30.0, // 원하는 세로 길이로 조정
+              child: ToggleButtons(
+                children: [
+                  Text(
+                    'My',
+                    style: TextStyle(color: _isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
+                  ),
+                  Text(
+                    'Mates',
+                    style: TextStyle(color: !_isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
+                  ),
+                ],
+                isSelected: [_isMySelected, !_isMySelected],
+                onPressed: (index) {
+                  setState(() {
+                    _isMySelected = index == 0;
+                  });
+                },
+                fillColor: Colors.pink, // 선택된 토글의 배경색 설정
               ),
-              Text(
-                'Mates',
-                style: TextStyle(color: !_isMySelected ? Colors.pink : Color(0xFFADD8E6)),
-              ),
-            ],
-            isSelected: [_isMySelected, !_isMySelected],
-            onPressed: (index) {
-              setState(() {
-                _isMySelected = index == 0;
-              });
-            },
+            ),
           ),
         ],
       ),
@@ -164,16 +193,10 @@ class _FirstTabState extends State<FirstTab> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: () {
-                showCupertinoDatePicker(
-                  context: context,
-                  onDateChanged: _onDateChanged,
-                  initialDateTime: _selectedDate,
-                );
-              },
+              onTap: _showDatePicker,
               child: Text(
                 '${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
-                style: TextStyle(fontSize: 24, decoration: TextDecoration.underline, color: Color(0xFFADD8E6)),
+                style: TextStyle(fontSize: 24, color: Colors.white), // 밑줄 제거
               ),
             ),
             SizedBox(height: 20),
@@ -181,18 +204,18 @@ class _FirstTabState extends State<FirstTab> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () => _toggleRecording('Work'),
+                  onPressed: () => _toggleRecording('ADD Work'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
                   ),
-                  child: Text(_isRecording && _currentType == 'Work' ? 'Done' : 'Work'),
+                  child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'ADD Work'),
                 ),
                 ElevatedButton(
-                  onPressed: () => _toggleRecording('Life'),
+                  onPressed: () => _toggleRecording('ADD Life'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
                   ),
-                  child: Text(_isRecording && _currentType == 'Life' ? 'Done' : 'Life'),
+                  child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'ADD Life'),
                 ),
               ],
             ),
@@ -205,16 +228,25 @@ class _FirstTabState extends State<FirstTab> {
                   return GestureDetector(
                     onLongPress: () => _deleteItem(index),
                     child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                      padding: EdgeInsets.all(2),
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                      padding: EdgeInsets.all(0),
                       decoration: BoxDecoration(
                         color: Color(0x33FFFFFF), // 푸른색 배경,
                         borderRadius: BorderRadius.circular(12),
+                        // border: Border.all(color: Colors.white), // 테두리를 흰색으로 설정
                       ),
                       child: ListTile(
-                        leading: Checkbox(
-                          value: item['complete'],
-                          onChanged: (value) => _toggleCheck(index),
+                        leading: Theme(
+                          data: ThemeData(
+                            unselectedWidgetColor: Colors.white, // 체크박스의 기본 색상을 흰색으로 설정
+                          ),
+                          child: Checkbox(
+                            value: item['complete'],
+                            onChanged: (value) => _toggleCheck(index),
+                            activeColor: Colors.white, // 선택된 상태의 체크박스 색상
+                            checkColor: Colors.black, // 체크박스 내부의 체크표시 색상
+                            side: BorderSide(color: Colors.white), // 체크박스 테두리 색상
+                          ),
                         ),
                         title: Text(
                           item['content'],

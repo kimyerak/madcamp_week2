@@ -31,12 +31,13 @@ class _SecondTabState extends State<SecondTab> {
       print('Failed to load todos: $e');
     }
   }
+
   void _showTodosDialog(DateTime day, List<Map<String, dynamic>> todos) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Todo for ${day}'),
+          title: Text('Todo for $day'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: todos.map((todo) => Text(todo['content'])).toList(),
@@ -53,15 +54,17 @@ class _SecondTabState extends State<SecondTab> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF023047),
+        backgroundColor: Color(0xFF004FA0),
         title: const Text(
           'Calender',
-          style: TextStyle(color: Colors.green),
+          style: TextStyle(color: Colors.white),
         ),
+
       ),
       backgroundColor: Color(0xFF004FA0),
       body: Column(
@@ -81,6 +84,32 @@ class _SecondTabState extends State<SecondTab> {
               _fetchTodosForSelectedDay(selectedDay);
             },
             eventLoader: _getTodosForDay,
+            calendarStyle: CalendarStyle(
+              defaultTextStyle: TextStyle(color: Colors.white), // 기본 날짜 텍스트 색상
+              weekendTextStyle: TextStyle(color: Colors.white), // 주말 날짜 텍스트 색상
+              selectedTextStyle: TextStyle(color: Colors.black), // 선택된 날짜 텍스트 색상
+              todayTextStyle: TextStyle(color: Colors.black), // 오늘 날짜 텍스트 색상
+            ),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: Colors.white), // 주중 텍스트 색상
+              weekendStyle: TextStyle(color: Colors.white), // 주말 텍스트 색상
+            ),
+            headerStyle: HeaderStyle(
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 16.0), // 월/연도 텍스트 색상
+              formatButtonTextStyle: TextStyle(color: Colors.white), // 포맷 버튼 텍스트 색상
+              formatButtonDecoration: BoxDecoration(
+                border: Border.all(color: Colors.white), // 포맷 버튼 테두리 색상
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              leftChevronIcon: Icon(
+                Icons.chevron_left,
+                color: Colors.white,
+              ),
+              rightChevronIcon: Icon(
+                Icons.chevron_right,
+                color: Colors.white,
+              ),
+            ),
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
@@ -94,11 +123,6 @@ class _SecondTabState extends State<SecondTab> {
               },
             ),
           ),
-          // ..._getTodosForDay(_selectedDay ?? _focusedDay).map(
-          //       (event) => ListTile(
-          //     title: Text(event),
-          //   ),
-          // ),
         ],
       ),
     );

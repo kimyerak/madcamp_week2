@@ -37,39 +37,36 @@ class _MainTabsPageState extends State<MainTabsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Main Tabs Page'),
-      // ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            backgroundColor: Color(0xFF004FA0),
             icon: Icon(Icons.mic),
             label: 'Voice Recognition',
           ),
           BottomNavigationBarItem(
-            backgroundColor: Color(0xFF023047),
+            backgroundColor: Color(0xFF004FA0),
             icon: Icon(Icons.calendar_today),
             label: 'Calendar',
           ),
           BottomNavigationBarItem(
-            backgroundColor: Color(0xFF023047),
+            backgroundColor: Color(0xFF004FA0),
             icon: Icon(Icons.list),
             label: 'Dash board',
           ),
           BottomNavigationBarItem(
-            backgroundColor: Color(0xFF023047),
+            backgroundColor: Color(0xFF004FA0),
             icon: Icon(Icons.person),
             label: 'My Page',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green[800],
-        unselectedItemColor: Colors.green[200],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white,
         onTap: _onItemTapped,
-         // 네비게이션 바의 배경색 설정
       ),
     );
   }
