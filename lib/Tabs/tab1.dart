@@ -232,22 +232,22 @@ class _FirstTabState extends State<FirstTab> with SingleTickerProviderStateMixin
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () => _toggleRecording('ADD Work'),
+                  onPressed: () => _toggleRecording('Work'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFFFD9D9)),
                   ),
-                  child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'Work'),//타입오류 제발주의...
+                  child: Text(_isRecording && _currentType == 'Work' ? 'Done' : 'ADD Work'),//타입오류 제발주의...
                 ),
                 ElevatedButton(
-                  onPressed: () => _toggleRecording('ADD Life'),
+                  onPressed: () => _toggleRecording('Life'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFAEDFF7)),
                   ),
-                  child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'Life'),//여기도
+                  child: Text(_isRecording && _currentType == 'Life' ? 'Done' : 'ADD Life'),//여기도
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 5),
             AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
