@@ -4,6 +4,7 @@ import 'package:madcamp_week2/api/google_signin_api.dart'; // GoogleSigninApi �
 import '4tab.dart'; // 로그인 후 이동할 메인 페이지를 import 합니다.
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart'; // Add this line
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -50,6 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     }
   }
+
   Future<String> check_if_new_or_exist(GoogleSignInAccount user) async {
     final url = Uri.parse('http://143.248.228.214:3000/users/signup');
     final response = await http.post(
@@ -74,6 +76,7 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'error';
     }
   }
+
   Future<void> send_newUserInfo_ToServer(GoogleSignInAccount user) async {
     final url = Uri.parse('http://143.248.228.214:3000/users/signup');
     final response = await http.post(
@@ -97,7 +100,6 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-
   void _navigateToMainTabsPage() async {
     final user = await GoogleSigninApi.login();
     if (user != null) {
@@ -111,7 +113,8 @@ class _SignUpPageState extends State<SignUpPage> {
       });
     }
   }
-    @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -123,34 +126,44 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // if (_user != null)
-            //   Column(
-            //     children: [
-            //       Text('Name: ${_user!.displayName}'),
-            //       Text('Email: ${_user!.email}'),
-            //     ],
-            //   )
-            // else
-            //   ElevatedButton(
-            //     onPressed: _login,
-            //     child: Text('Sign in/up with Google'),
-            //   ),
-            ElevatedButton(
-              onPressed: _login,
-              child: Text('Sign in/up with Google'),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/Image/voice-record.svg',
+                  height: 100,
+                  width: 100,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+                ElevatedButton.icon(
+                  icon: Image.asset(
+                    'assets/Image/google.png',
+                    height: 24, // 버튼 세로 높이와 이미지 크기를 맞춤
+                    fit: BoxFit.contain,
+                  ),
+                  label: Text('Sign in/up with Google'),
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height:20,
             ),
             ElevatedButton(
               onPressed: _navigateToMainTabsPage,
               child: Text('이미 로그인 했어요'),
             ),
-
           ],
         ),
       ),
     );
   }
-  Future signIn() async{
+
+  Future signIn() async {
     await GoogleSigninApi.login();
   }
-
 }

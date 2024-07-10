@@ -56,4 +56,6 @@ flutter:
     - assets/image/default.png
     - assets/image/record.png
     - assets/image/dashboard.png
+    - assets/image/google.png
+    - assets/image/voice-record.png
 
