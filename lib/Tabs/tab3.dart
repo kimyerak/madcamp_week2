@@ -109,7 +109,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   color: Color(0xFF004FA0), // 이전과 동일한 배경색
                 ),
                 child: buildMonthlyAnalysis(),
-              ),
+              ),//
             ],
           ),
         );

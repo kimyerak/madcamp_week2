@@ -24,7 +24,7 @@ class _SecondTabState extends State<SecondTab> {
     try {
       List<Map<String, dynamic>> todos = await getTodosByDate(widget.user.displayName!, day);
       setState(() {
-        _todosByDate[day] = todos;
+        _todosByDate[day] = todos;//
       });
       _showTodosDialog(day, todos);
     } catch (e) {
