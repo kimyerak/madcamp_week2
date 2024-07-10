@@ -271,7 +271,7 @@ class DialogForTab2 {
                           decoration: item['complete']
                               ? TextDecoration.lineThrough
                               : null,
-                          color: item['type'] == 'Work' ? Colors.blue : Colors.green,
+                          color: item['type'] == 'Work' ? Colors.blue : Colors.red,
                         ),
                       ),
                     );
@@ -313,10 +313,13 @@ class DialogForTab2 {
       List<Map<String, dynamic>> todos = await getTodosByDate(user.displayName!, day);
       for (var todo in todos) {
         if (todo['date'] == null) {
-          todo['date'] = DateTime(day.year, day.month, day.day);
+          todo['date'] = DateFormat('yyyy-MM-dd').format(day); // 날짜를 문자열로 변환
+        } else if (todo['date'] is String) {
+          todo['date'] = DateTime.parse(todo['date']); // 문자열을 DateTime 객체로 변환
+        } else if (todo['date'] is DateTime) {
+          todo['date'] = todo['date']; // 이미 DateTime 객체인 경우 그대로 사용
         } else {
-          DateTime todoDate = todo['date'];
-          todo['date'] = DateTime(todoDate.year, todoDate.month, todoDate.day);
+          throw Exception('Unexpected date format');
         }
       }
       updateTodoList(todos);
