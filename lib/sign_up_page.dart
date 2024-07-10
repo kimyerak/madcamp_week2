@@ -10,9 +10,25 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateMixin {
   GoogleSignInAccount? _user;
   String _message = '';
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void _login() async {
     final user = await GoogleSigninApi.login();
@@ -50,6 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     }
   }
+
   Future<String> check_if_new_or_exist(GoogleSignInAccount user) async {
     final url = Uri.parse('http://143.248.228.214:3000/users/signup');
     final response = await http.post(
@@ -74,6 +91,7 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'error';
     }
   }
+
   Future<void> send_newUserInfo_ToServer(GoogleSignInAccount user) async {
     final url = Uri.parse('http://143.248.228.214:3000/users/signup');
     final response = await http.post(
@@ -97,7 +115,6 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-
   void _navigateToMainTabsPage() async {
     final user = await GoogleSigninApi.login();
     if (user != null) {
@@ -111,7 +128,8 @@ class _SignUpPageState extends State<SignUpPage> {
       });
     }
   }
-    @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -123,34 +141,54 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // if (_user != null)
-            //   Column(
-            //     children: [
-            //       Text('Name: ${_user!.displayName}'),
-            //       Text('Email: ${_user!.email}'),
-            //     ],
-            //   )
-            // else
-            //   ElevatedButton(
-            //     onPressed: _login,
-            //     child: Text('Sign in/up with Google'),
-            //   ),
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1 + _animationController.value * 0.1,
+                  child: child,
+                );
+              },
+              child: Image.asset(
+                'assets/image/record.png',
+                width: 150, // 적당한 크기로 조정
+                height: 150,
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height:50),
             ElevatedButton(
               onPressed: _login,
-              child: Text('Sign in/up with Google'),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  SizedBox(width: 3), // 간격 조정
+                  Container(
+                    child: Image.asset(
+                      'assets/image/google.png',
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(width: 10), // 간격 조정
+                  Text('Sign in/up with Google'),
+                ],
+              ),
             ),
+            SizedBox(height: 30),
             ElevatedButton(
               onPressed: _navigateToMainTabsPage,
-              child: Text('이미 로그인 했어요'),
+              child: Text('이미 로그인 이력이 있어요!'),
             ),
-
           ],
         ),
       ),
     );
   }
-  Future signIn() async{
+
+  Future signIn() async {
     await GoogleSigninApi.login();
   }
-
 }
