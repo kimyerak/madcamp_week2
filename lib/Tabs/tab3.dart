@@ -120,9 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 20,),
-
-          SizedBox(height: 20,),
+          SizedBox(height: 40,),
           SizedBox(
             height: 200,
             child: PieChart(
@@ -168,7 +166,7 @@ class _DashboardPageState extends State<DashboardPage> {
           margin: EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white),
+            // border: Border.all(color: Colors.white),
             color: Color(0xFF004FA0), // 이전과 동일한 배경색
           ),
           child: buildWeeklyAnalysis(weeklyTodoList),
@@ -188,7 +186,7 @@ class _DashboardPageState extends State<DashboardPage> {
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.all(10),
+                margin: EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.white),
@@ -197,7 +195,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: _buildDailyAnalysis(),
               ),
               Container(
-                margin: EdgeInsets.all(10),
+                margin: EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.white),
@@ -206,7 +204,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: buildWeeklyAnalysis(weeklyTodoList),
               ),
               Container(
-                margin: EdgeInsets.all(10),
+                margin: EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.white),
