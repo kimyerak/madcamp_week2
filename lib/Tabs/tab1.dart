@@ -21,7 +21,7 @@ class FirstTab extends StatefulWidget {
   _FirstTabState createState() => _FirstTabState();
 }
 
-class _FirstTabState extends State<FirstTab> {
+class _FirstTabState extends State<FirstTab> with SingleTickerProviderStateMixin {
 
   DateTime _selectedDate = DateTime.now();
   List<Map<String, dynamic>> _todoList = [];
@@ -31,11 +31,24 @@ class _FirstTabState extends State<FirstTab> {
   String? _currentRecordingPath;
   String? _currentType;
 
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
     _loadTodoList();
     _fetchTodosForSelectedDay(_selectedDate);
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();//애니메이션 허용??
+    super.dispose();
   }
 
   //방법1. shared prefernece로 불러오기
@@ -93,6 +106,7 @@ class _FirstTabState extends State<FirstTab> {
       _isRecording = true;
       _currentType = type;
     });
+    _animationController.repeat(reverse: true);//애니메이션 시작시점
   }
 
   Future<void> _stopRecording() async {
@@ -117,6 +131,7 @@ class _FirstTabState extends State<FirstTab> {
       _isRecording = false;
       _currentType = null;
     });
+    _animationController.stop();//애니메이션 종료시점 설정
   }
 
   void _toggleCheck(int index) async {
@@ -219,20 +234,35 @@ class _FirstTabState extends State<FirstTab> {
                 ElevatedButton(
                   onPressed: () => _toggleRecording('ADD Work'),
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFFFD9D9)),
                   ),
                   child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'ADD Work'),
                 ),
                 ElevatedButton(
                   onPressed: () => _toggleRecording('ADD Life'),
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFAEDFF7)),
                   ),
                   child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'ADD Life'),
                 ),
               ],
             ),
             SizedBox(height: 20),
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1 + _animationController.value * 0.1,
+                  child: child,
+                );
+              },
+              child: Image.asset(
+                'assets/image/record.png',
+                width: 100, // 이미지의 가로 길이
+                height: 100, // 이미지의 세로 길이
+                fit: BoxFit.contain, // 이미지가 영역을 넘어가지 않도록 조정
+              ),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: _todoList.length,
@@ -265,7 +295,9 @@ class _FirstTabState extends State<FirstTab> {
                           item['content'],
                           style: TextStyle(
                             decoration: item['complete'] ? TextDecoration.lineThrough : null,
-                            color: item['type'] == 'Work' ? Color(0xFFFFC1C1) : Color(0xFFB0E0E6),
+                            decorationThickness: item['complete'] ? 4.0 : null, // 밑줄 두께 설정
+                            decorationColor: item['complete'] ? Colors.white : null, // 밑줄 색상 설정
+                            color: item['type'] == 'Work' ? Color(0xFFFFD9D9) : Color(0xFFAEDFF7),
                           ),
                         ),
                       ),

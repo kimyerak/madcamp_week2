@@ -54,7 +54,10 @@ class _MainTabsPageState extends State<MainTabsPage> {
           ),
           BottomNavigationBarItem(
             backgroundColor: Color(0xFF004FA0),
-            icon: Icon(Icons.list),
+            icon: ImageIcon(
+              AssetImage('assets/image/dashboard.png'),
+              size: 24, // 아이콘의 크기를 적당하게 조정하세요
+            ),
             label: 'Dash board',
           ),
           BottomNavigationBarItem(

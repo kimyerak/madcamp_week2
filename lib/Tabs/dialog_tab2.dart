@@ -237,46 +237,74 @@ class DialogForTab2 {
   });
 
   void showTodosDialog(List<Map<String, dynamic>> todoList, DateTime day) {
+    int totalTodos = todoList.length;
+    int completedTodos = todoList.where((todo) => todo['complete']).length;
+    double completionRate = totalTodos > 0 ? completedTodos / totalTodos : 0.0;
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('Todo for ${DateFormat('yyyy-MM-dd').format(day)}'),
-              content: Container(
-                width: double.maxFinite,
-                height: 400,
-                child: ListView.builder(
-                  itemCount: todoList.length,
-                  itemBuilder: (context, index) {
-                    final item = todoList[index];
-                    return ListTile(
-                      leading: Checkbox(
-                        value: item['complete'],
-                        onChanged: (value) {
-                          setState(() {
-                            item['complete'] = value;
-                          });
-                          toggleCheck(todoList, index, (updateState) {
-                            setState(() {
-                              todoList[index]['complete'] = value;
-                            });
-                          });
-                        },
+              title: Text('         ${DateFormat('yyyy-MM-dd').format(day)}'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.maxFinite,
+                    height: 300,
+                    child: ListView.builder(
+                      itemCount: todoList.length,
+                      itemBuilder: (context, index) {
+                        final item = todoList[index];
+                        return ListTile(
+                          leading: Checkbox(
+                            value: item['complete'],
+                            onChanged: (value) {
+                              setState(() {
+                                item['complete'] = value;
+                                completedTodos = todoList.where((todo) => todo['complete']).length;
+                                completionRate = totalTodos > 0 ? completedTodos / totalTodos : 0.0;
+                              });
+                              toggleCheck(todoList, index, (updateState) {
+                                setState(() {
+                                  todoList[index]['complete'] = value;
+                                });
+                              });
+                            },
+                          ),
+                          title: Text(
+                            item['content'],
+                            style: TextStyle(
+                              decoration: item['complete']
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              decorationThickness: 4.0,
+                              decorationColor: Colors.black,
+                              color: item['type'] == 'Work' ? Colors.red[200] : Colors.blue[200],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text('Progress'),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0), // 둥근 가장자리 설정
+                    child: Container(
+                      height: 20.0, // 높이를 더 두껍게 설정
+                      child: LinearProgressIndicator(
+                        value: completionRate,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF004FA0)), // 진파란색으로 설정
                       ),
-                      title: Text(
-                        item['content'],
-                        style: TextStyle(
-                          decoration: item['complete']
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: item['type'] == 'Work' ? Colors.blue : Colors.red,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text('${(completionRate * 100).toStringAsFixed(1)}% Completed'),
+                ],
               ),
               actions: [
                 TextButton(

@@ -54,48 +54,68 @@ class _SecondTabState extends State<SecondTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: Text('Calendar', style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF004FA0),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime(2020),
-            lastDay: DateTime(2030),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) {
-              return _selectedDay != null &&
-                  _selectedDay!.year == day.year &&
-                  _selectedDay!.month == day.month &&
-                  _selectedDay!.day == day.day;
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                _focusedDay = DateTime(focusedDay.year, focusedDay.month, focusedDay.day);
-              });
-              DialogForTab2(context: context,
-                user: widget.user,
-              ).fetchTodosForSelectedDay(_selectedDay!, _updateTodoList);
-            },
-            eventLoader: (day) {
-              print("eventLoader 호출 시도중 $day");
-              return _todosByDate[DateTime(day.year, day.month, day.day)] != null ? List.filled(_todosByDate[DateTime(day.year, day.month, day.day)]!, 'events') : [];
-            },
-            calendarBuilders: CalendarBuilders(
-              markerBuilder: (context, date, events) {
-                if (events.isNotEmpty) {
-                  print("마커 호출 시도중 $date, events: $events");
-                  return Positioned(
-                    right: 1,
-                    bottom: 1,
-                    child: _buildTodosMarker(date, events.length),
-                  );
-                }
-                return SizedBox();
+      body: Container(
+        color: Color(0xFF004FA0),
+        child: Column(
+          children: [
+            TableCalendar(
+              firstDay: DateTime(2020),
+              lastDay: DateTime(2030),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) {
+                return _selectedDay != null &&
+                    _selectedDay!.year == day.year &&
+                    _selectedDay!.month == day.month &&
+                    _selectedDay!.day == day.day;
               },
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+                  _focusedDay = DateTime(focusedDay.year, focusedDay.month, focusedDay.day);
+                });
+                DialogForTab2(context: context,
+                  user: widget.user,
+                ).fetchTodosForSelectedDay(_selectedDay!, _updateTodoList);
+              },
+              eventLoader: (day) {
+                print("eventLoader 호출 시도중 $day");
+                return _todosByDate[DateTime(day.year, day.month, day.day)] != null ? List.filled(_todosByDate[DateTime(day.year, day.month, day.day)]!, 'events') : [];
+              },
+              calendarBuilders: CalendarBuilders(
+                markerBuilder: (context, date, events) {
+                  if (events.isNotEmpty) {
+                    print("마커 호출 시도중 $date, events: $events");
+                    return Positioned(
+                      right: 1,
+                      bottom: 1,
+                      child: _buildTodosMarker(date, events.length),
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
+              headerStyle: HeaderStyle(
+                titleTextStyle: TextStyle(color: Colors.white),
+                formatButtonTextStyle: TextStyle(color: Colors.white),
+                leftChevronIcon: Icon(Icons.chevron_left, color: Colors.white),
+                rightChevronIcon: Icon(Icons.chevron_right, color: Colors.white),
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: TextStyle(color: Colors.white),
+                weekendStyle: TextStyle(color: Colors.white),
+              ),
+              calendarStyle: CalendarStyle(
+                defaultTextStyle: TextStyle(color: Colors.white),
+                weekendTextStyle: TextStyle(color: Colors.white),
+                todayTextStyle: TextStyle(color: Colors.black),
+                selectedTextStyle: TextStyle(color: Colors.black),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
