@@ -68,7 +68,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   }
 
   Future<String> check_if_new_or_exist(GoogleSignInAccount user) async {
-    final url = Uri.parse('http://143.248.228.214:3000/users/signup');
+    final url = Uri.parse('http://172.10.7.93:80/users/signup');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -93,7 +93,7 @@ class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateM
   }
 
   Future<void> send_newUserInfo_ToServer(GoogleSignInAccount user) async {
-    final url = Uri.parse('http://143.248.228.214:3000/users/signup');
+    final url = Uri.parse('http://172.10.7.93:80/users/signup');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
