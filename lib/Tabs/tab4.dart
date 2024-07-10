@@ -78,32 +78,113 @@ class _MyPageState extends State<MyPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image.asset(
+              'assets/image/default.png',
+              height: 100,
+            ),
             if (widget.user.photoUrl != null)
               CircleAvatar(
                 backgroundImage: NetworkImage(widget.user.photoUrl!),
                 radius: 50,
               ),
-            SizedBox(height: 10), // Reduced the height
-            Text(
-              'id: ${widget.user.id}',
-              style: TextStyle(fontSize: 20, color: Colors.white),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Table(
+                border: TableBorder.all(color: Colors.white),
+                columnWidths: const {
+                  0: FlexColumnWidth(),
+                  1: FlexColumnWidth(2),
+                },
+                children: [
+                  TableRow(
+                    children: [
+                      Container(
+                        color: Colors.white.withOpacity(0.2),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'ID',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          widget.user.id,
+                          style: TextStyle(fontSize: 14, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Container(
+                        color: Colors.white.withOpacity(0.2),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Name',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          widget.user.displayName ?? '',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Container(
+                        color: Colors.white.withOpacity(0.2),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Email',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          widget.user.email,
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      Container(
+                        color: Colors.white.withOpacity(0.2),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Running Mate',
+                          style: TextStyle(fontSize: 14.5, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          runningMate ?? 'No Running Mate set',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 5), // Reduced the height
-            Text(
-              'Name: ${widget.user.displayName}',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            SizedBox(height: 5), // Reduced the height
-            Text(
-              'Email: ${widget.user.email}',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            SizedBox(height: 10), // Reduced the height
-            Text(
-              'Running Mate: $runningMate',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            SizedBox(height: 10), // Kept as is for better button spacing
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _showRunningMateDialog,
               style: ButtonStyle(
