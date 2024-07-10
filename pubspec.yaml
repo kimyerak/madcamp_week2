@@ -54,4 +54,6 @@ flutter:
   assets:
     - assets/test.json
     - assets/image/default.png
+    - assets/image/record.png
+    - assets/image/dashboard.png
 
