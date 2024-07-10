@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:madcamp_week2/Tabs/tab1.dart'; // 각 탭의 페이지들을 import 합니다.
 import 'package:madcamp_week2/Tabs/real_tab2.dart';
 import 'package:madcamp_week2/Tabs/tab3.dart';
-import 'package:madcamp_week2/Tabs/tab4.dart';
+import 'package:madcamp_week2/Tabs/tab4.dart';//
 import 'package:google_sign_in/google_sign_in.dart';
 
 class MainTabsPage extends StatefulWidget {

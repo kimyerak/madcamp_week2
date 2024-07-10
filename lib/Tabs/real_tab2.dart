@@ -131,7 +131,7 @@ class _SecondTabState extends State<SecondTab> {
       child: Center(
         child: Text(
           '$eventcount',
-          style: TextStyle().copyWith(
+          style: TextStyle().copyWith(//
             color: Colors.white,
             fontSize: 12.0,
           ),
