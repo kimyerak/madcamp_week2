@@ -18,7 +18,7 @@ Widget buildDailyAnalysis(List<Map<String, dynamic>> userDayTodoList) {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text('오늘의 Work/Life 비율', style: TextStyle(fontSize: 18)),
+        Text('오늘의 Work/Life 비율', style: TextStyle(fontSize: 18, color: Colors.white)),
         SizedBox(
           height: 200,
           child: PieChart(

@@ -4,9 +4,6 @@ import 'dart:convert';
 import 'package:text_analysis/text_analysis.dart';
 import 'package:word_cloud/word_cloud.dart';
 
-
-
-
 Future<Map<String, double>> collectFrequentWords(List<String> texts, int minFrequency) async {
   final Map<String, double> wordFrequencies = {};
   try {
@@ -66,15 +63,25 @@ Widget buildMonthlyAnalysis() {
         WordCloudData wcdata = WordCloudData(data: convertedList);
 
         return Center(
-          child: WordCloudView(
-            data: wcdata,
-            maxtextsize: 50,
-            mintextsize: 10,
-            mapcolor: Colors.white,
-            mapwidth: 300,
-            mapheight: 350,
-            fontWeight: FontWeight.bold,
-            colorlist: [Colors.blue, Colors.green, Colors.black],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '이달의 KeyWord',
+                style: TextStyle(fontSize: 18, color: Colors.white), // 제목 텍스트를 흰색으로 설정
+              ),
+              SizedBox(height: 20), // 텍스트와 워드클라우드 사이에 간격 추가
+              WordCloudView(
+                data: wcdata,
+                maxtextsize: 50,
+                mintextsize: 10,
+                mapcolor: Color(0x33FFFFFF), // 여기에서 배경색 설정
+                mapwidth: 300,
+                mapheight: 350,
+                fontWeight: FontWeight.bold,
+                colorlist: [Colors.blue, Colors.green, Colors.black],
+              ),
+            ],
           ),
         );
       } else {

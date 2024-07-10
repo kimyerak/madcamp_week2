@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:madcamp_week2/component/speech_recognition.dart';
-import 'package:intl/intl.dart'; // 날짜 형식을 위한 패키지 추가
+import 'package:intl/intl.dart';
 import 'package:madcamp_week2/component/datepicker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -10,6 +10,7 @@ import 'package:madcamp_week2/api/user_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:madcamp_week2/component/todo_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class FirstTab extends StatefulWidget {
   final GoogleSignInAccount user;
@@ -21,31 +22,31 @@ class FirstTab extends StatefulWidget {
 }
 
 class _FirstTabState extends State<FirstTab> {
+
   DateTime _selectedDate = DateTime.now();
   List<Map<String, dynamic>> _todoList = [];
-  final SpeechRecognitionService _speechRecognitionService =
-      SpeechRecognitionService();
-
+  final SpeechRecognitionService _speechRecognitionService = SpeechRecognitionService();
+  bool _isMySelected = true;
+  bool _isRecording = false;
+  String? _currentRecordingPath;
+  String? _currentType;
 
   @override
   void initState() {
     super.initState();
-    _loadTodoList();  // 앱 실행 시 저장된 투두리스트를 로드
+    _loadTodoList();
     _fetchTodosForSelectedDay(_selectedDate);
   }
 
   //방법1. shared prefernece로 불러오기
   Future<void> _loadTodoList() async {
-    SharedPreferences prefs =
-        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 가져오기
-    String? todoListString =
-        prefs.getString('todoList'); // 저장된 투두리스트 데이터를 JSON 형식으로 가져오기
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? todoListString = prefs.getString('todoList');
     if (todoListString != null) {
       Map<String, dynamic> decodedMap = json.decode(todoListString);
       setState(() {
         _todoList = List<Map<String, dynamic>>.from(json.decode(todoListString));
-
-         });
+      });
     }
   }
 
@@ -53,8 +54,7 @@ class _FirstTabState extends State<FirstTab> {
   void _fetchTodosForSelectedDay(DateTime day) async {
     try {
       print("api함수 호출하는중");
-      List<Map<String, dynamic>> todos =
-          await getTodosByDate(widget.user.displayName!, day);
+      List<Map<String, dynamic>> todos = await getTodosByDate(widget.user.displayName!, day);
       print("Todos fetched: $todos");
       setState(() {
         _todoList = todos;
@@ -66,44 +66,57 @@ class _FirstTabState extends State<FirstTab> {
 
   // 투두리스트를 SharedPreferences에 저장하는 메서드
   Future<void> _saveTodoList() async {
-    SharedPreferences prefs =
-        await SharedPreferences.getInstance(); // SharedPreferences 인스턴스 가져오기
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     String todoListString = json.encode(_todoList);
-    await prefs.setString(
-        'todoList', todoListString); // 변환된 JSON 데이터를 SharedPreferences에 저장
+    await prefs.setString('todoList', todoListString);
   }
 
   // 선택된 날짜를 변경하는 메서드
   void _onDateChanged(DateTime newDate) {
     setState(() {
-      _selectedDate = newDate; // _selectedDate를 새로운 날짜로 변경
+      _selectedDate = newDate;
     });
     _fetchTodosForSelectedDay(_selectedDate);
   }
 
-  Future<void> _recordAndRecognize(String type) async {
-    String? filePath = await _speechRecognitionService.record();
-    if (filePath != null) {
-      String? recognizedText =
-          await _speechRecognitionService.recognizeSpeech(filePath);
+  Future<void> _toggleRecording(String type) async {
+    if (_isRecording && _currentType == type) {
+      await _stopRecording();
+    } else {
+      await _startRecording(type);
+    }
+  }
+
+  Future<void> _startRecording(String type) async {
+    _currentRecordingPath = await _speechRecognitionService.startRecording();
+    setState(() {
+      _isRecording = true;
+      _currentType = type;
+    });
+  }
+
+  Future<void> _stopRecording() async {
+    await _speechRecognitionService.stopRecording();
+    if (_currentRecordingPath != null) {
+      String? recognizedText = await _speechRecognitionService.recognizeSpeech(_currentRecordingPath!);
       if (recognizedText != null) {
         final newTodo = {
-          'type': type,
+          'type': _currentType,
           'content': recognizedText,
           'complete': false
         };
         setState(() {
-          _todoList.add({'type': type, 'content': recognizedText, 'complete': false //여기에 post 호출
+          _todoList.add(newTodo);
         });
-        });
-        await addTodoToDB(
-            widget.user.displayName ?? '', _selectedDate, newTodo);
-        Provider.of<TodoProvider>(context, listen: false).addTodoItem(
-            _selectedDate,
-            {'type': type, 'content': recognizedText, 'complete': false});
+        await addTodoToDB(widget.user.displayName ?? '', _selectedDate, newTodo);
+        Provider.of<TodoProvider>(context, listen: false).addTodoItem(_selectedDate, newTodo);
         _saveTodoList();
       }
     }
+    setState(() {
+      _isRecording = false;
+      _currentType = null;
+    });
   }
 
   void _toggleCheck(int index) async {
@@ -132,78 +145,137 @@ class _FirstTabState extends State<FirstTab> {
     _saveTodoList();
   }
 
+  void _showDatePicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: _selectedDate,
+            onDateTimeChanged: (DateTime newDate) {
+              _onDateChanged(newDate);
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF023047),
-        title: const Text('To-Do list',
+        backgroundColor: Color(0xFF004FA0),
+        title: const Text('To-Do-Listener',
             style: TextStyle(fontSize: 25, color: Colors.white)),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onTap: () {
-              showCupertinoDatePicker(
-                context: context,
-                onDateChanged: _onDateChanged,
-                initialDateTime: _selectedDate,
-              );
-            },
-            child: Text(
-              'Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
-              style:
-                  TextStyle(fontSize: 24, decoration: TextDecoration.underline),
-            ),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => _recordAndRecognize('Work'),
-                child: Text('Work'),
-              ),
-              ElevatedButton(
-                onPressed: () => _recordAndRecognize('Life'),
-                child: Text('Life'),
-              ),
-            ],
-          ),
-          // ElevatedButton(
-          //   onPressed: () => _fetchTodosForSelectedDay(_selectedDate),
-          //   child: Text('DB todo 불러오기'),
-          // ),
-          SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _todoList.length,
-              itemBuilder: (context, index) {
-                final item = _todoList[index];
-                return GestureDetector(
-                  onLongPress: () => _deleteItem(index),
-                  child: ListTile(
-                    leading: Checkbox(
-                      value: item['complete'],
-                      onChanged: (value) => _toggleCheck(index),
-                    ),
-                    title: Text(
-                      item['content'],
-                      style: TextStyle(
-                        decoration: item['complete']
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color:
-                            item['type'] == 'Work' ? Colors.blue : Colors.green,
-                      ),
-                    ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0), // 왼쪽으로 패딩 추가
+            child: Container(
+              width: 100.0, // 원하는 가로 길이로 조정
+              height: 30.0, // 원하는 세로 길이로 조정
+              child: ToggleButtons(
+                children: [
+                  Text(
+                    'My',
+                    style: TextStyle(color: _isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
                   ),
-                );
-              },
+                  Text(
+                    'Mates',
+                    style: TextStyle(color: !_isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
+                  ),
+                ],
+                isSelected: [_isMySelected, !_isMySelected],
+                onPressed: (index) {
+                  setState(() {
+                    _isMySelected = index == 0;
+                  });
+                },
+                fillColor: Colors.pink, // 선택된 토글의 배경색 설정
+              ),
             ),
           ),
         ],
+      ),
+      body: Container(
+        color: Color(0xFF004FA0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: _showDatePicker,
+              child: Text(
+                '${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
+                style: TextStyle(fontSize: 24, color: Colors.white), // 밑줄 제거
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _toggleRecording('ADD Work'),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                  ),
+                  child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'ADD Work'),
+                ),
+                ElevatedButton(
+                  onPressed: () => _toggleRecording('ADD Life'),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                  ),
+                  child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'ADD Life'),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _todoList.length,
+                itemBuilder: (context, index) {
+                  final item = _todoList[index];
+                  return GestureDetector(
+                    onLongPress: () => _deleteItem(index),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                      padding: EdgeInsets.all(0),
+                      decoration: BoxDecoration(
+                        color: Color(0x33FFFFFF), // 푸른색 배경,
+                        borderRadius: BorderRadius.circular(12),
+                        // border: Border.all(color: Colors.white), // 테두리를 흰색으로 설정
+                      ),
+                      child: ListTile(
+                        leading: Theme(
+                          data: ThemeData(
+                            unselectedWidgetColor: Colors.white, // 체크박스의 기본 색상을 흰색으로 설정
+                          ),
+                          child: Checkbox(
+                            value: item['complete'],
+                            onChanged: (value) => _toggleCheck(index),
+                            activeColor: Colors.white, // 선택된 상태의 체크박스 색상
+                            checkColor: Colors.black, // 체크박스 내부의 체크표시 색상
+                            side: BorderSide(color: Colors.white), // 체크박스 테두리 색상
+                          ),
+                        ),
+                        title: Text(
+                          item['content'],
+                          style: TextStyle(
+                            decoration: item['complete'] ? TextDecoration.lineThrough : null,
+                            color: item['type'] == 'Work' ? Color(0xFFFFC1C1) : Color(0xFFB0E0E6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

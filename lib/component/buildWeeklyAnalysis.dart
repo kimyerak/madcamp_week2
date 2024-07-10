@@ -35,7 +35,7 @@ Widget buildWeeklyAnalysis(List<Map<String, dynamic>> userDayTodoList) {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text('지난 7일간의 달성율', style: TextStyle(fontSize: 18)),
+        Text('지난 7일간의 달성율', style: TextStyle(fontSize: 18, color: Colors.white)),
         SizedBox(
           height: 200,
           child: LineChart(
