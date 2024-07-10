@@ -6,7 +6,7 @@ import 'package:madcamp_week2/Tabs/tab1.dart';
 import 'package:intl/intl.dart';
 
 Future<void> addTodoToDB(String name, DateTime date, Map<String, dynamic> newtodo) async {
-  final url = 'http://143.248.228.214:3000/users/todolists'; // 백엔드 API 엔드포인트
+  final url = 'http://172.10.7.93:80/users/todolists'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'user_day_todolist': [
@@ -31,7 +31,7 @@ Future<void> addTodoToDB(String name, DateTime date, Map<String, dynamic> newtod
 }
 
 Future<void> deleteTodoFromDB(String name, DateTime date, String content) async {
-  final url = 'http://143.248.228.214:3000/users/todolists/delete'; // 백엔드 API 엔드포인트
+  final url = 'http://172.10.7.93:80/users/todolists/delete'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'name': name,
@@ -51,7 +51,7 @@ Future<void> deleteTodoFromDB(String name, DateTime date, String content) async 
   }}
 
 Future<void> updateTodoInDB(String name, DateTime date, Map<String, dynamic> todo) async {
-  final url = 'http://143.248.228.214:3000/users/todolists/update'; // 백엔드 API 엔드포인트
+  final url = 'http://172.10.7.93:80/users/todolists/update'; // 백엔드 API 엔드포인트
   final headers = {'Content-Type': 'application/json'};
   final body = json.encode({
     'name': name,
@@ -75,7 +75,7 @@ Future<void> updateTodoInDB(String name, DateTime date, Map<String, dynamic> tod
 
 Future<List<Map<String, dynamic>>> getTodosByDate(String name, DateTime date) async {
   final formattedDate = DateFormat('yyyy-MM-dd').format(date);
-  final url = Uri.parse('http://143.248.228.214:3000/users/todobydate?name=$name&date=$formattedDate');
+  final url = Uri.parse('http://172.10.7.93:80/users/todobydate?name=$name&date=$formattedDate');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -88,7 +88,7 @@ Future<List<Map<String, dynamic>>> getTodosByDate(String name, DateTime date) as
   }
 }
 Future<Map<String, dynamic>> getAllTodos(String name) async {
-  final url = Uri.parse('http://143.248.228.214:3000/users/alltodos?name=$name');
+  final url = Uri.parse('http://172.10.7.93:80/users/alltodos?name=$name');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -111,7 +111,7 @@ Future<List<Map<String, dynamic>>> getTodosByWeek(String name, DateTime startDat
   final endDate = startDate.add(Duration(days: 6));
   final formattedEndDate = formatter.format(endDate);
 
-  final url = Uri.parse('http://143.248.228.214:3000/users/todobyweek?name=$name&start_date=$formattedStartDate&end_date=$formattedEndDate');
+  final url = Uri.parse('http://172.10.7.93:80/users/todobyweek?name=$name&start_date=$formattedStartDate&end_date=$formattedEndDate');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -125,7 +125,7 @@ Future<List<Map<String, dynamic>>> getTodosByWeek(String name, DateTime startDat
 
 
 Future<List<Map<String, dynamic>>> getTodosByMonth(String name, int year, int month) async {
-  final url = Uri.parse('http://143.248.228.214:3000/users/todobymonth?name=$name&year=$year&month=$month');
+  final url = Uri.parse('http://172.10.7.93:80/users/todobymonth?name=$name&year=$year&month=$month');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
