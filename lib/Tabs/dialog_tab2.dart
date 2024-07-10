@@ -281,7 +281,7 @@ class DialogForTab2 {
                                   ? TextDecoration.lineThrough
                                   : null,
                               decorationThickness: 4.0,
-                              decorationColor: Colors.white,
+                              decorationColor: Colors.black,
                               color: item['type'] == 'Work' ? Colors.red[200] : Colors.blue[200],
                             ),
                           ),
@@ -291,10 +291,16 @@ class DialogForTab2 {
                   ),
                   SizedBox(height: 16),
                   Text('Progress'),
-                  LinearProgressIndicator(
-                    value: completionRate,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0), // 둥근 가장자리 설정
+                    child: Container(
+                      height: 20.0, // 높이를 더 두껍게 설정
+                      child: LinearProgressIndicator(
+                        value: completionRate,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF004FA0)), // 진파란색으로 설정
+                      ),
+                    ),
                   ),
                   SizedBox(height: 8),
                   Text('${(completionRate * 100).toStringAsFixed(1)}% Completed'),

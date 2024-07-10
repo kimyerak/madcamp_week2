@@ -90,98 +90,103 @@ class _MyPageState extends State<MyPage> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Table(
-                border: TableBorder.all(color: Colors.white),
-                columnWidths: const {
-                  0: FlexColumnWidth(),
-                  1: FlexColumnWidth(2),
-                },
-                children: [
-                  TableRow(
-                    children: [
-                      Container(
-                        color: Colors.white.withOpacity(0.2),
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'ID',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(),
+                    1: FlexColumnWidth(2),
+                  },
+                  children: [
+                    TableRow(
+                      children: [
+                        Container(
+                          color: Colors.white.withOpacity(0.2),
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'ID',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.user.id,
-                          style: TextStyle(fontSize: 14, color: Colors.white),
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.user.id,
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      Container(
-                        color: Colors.white.withOpacity(0.2),
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Name',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Container(
+                          color: Colors.white.withOpacity(0.2),
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Name',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.user.displayName ?? '',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.user.displayName ?? '',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      Container(
-                        color: Colors.white.withOpacity(0.2),
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Email',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Container(
+                          color: Colors.white.withOpacity(0.2),
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Email',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.user.email,
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.user.email,
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      Container(
-                        color: Colors.white.withOpacity(0.2),
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'Running Mate',
-                          style: TextStyle(fontSize: 14.5, color: Colors.white),
-                          textAlign: TextAlign.center,
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        Container(
+                          color: Colors.white.withOpacity(0.2),
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Running Mate',
+                            style: TextStyle(fontSize: 14.5, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          runningMate ?? 'No Running Mate set',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.center,
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            runningMate ?? 'No Running Mate set',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 20),
