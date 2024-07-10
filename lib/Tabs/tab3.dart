@@ -8,9 +8,13 @@ import 'package:madcamp_week2/component/buildweeklyAnalysis.dart';
 import 'package:madcamp_week2/component/buildmonthlyAnalysis.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
+import 'package:madcamp_week2/api/user_api.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final GoogleSignInAccount user;
+  const DashboardPage({Key? key, required this.user}) : super(key: key);
 
   @override
   _DashboardPageState createState() => _DashboardPageState();
@@ -18,32 +22,84 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   List<Map<String, dynamic>> userDayTodoList = [];
+  List<Map<String, dynamic>> weeklyTodoList = [];
+  List<Map<String, dynamic>> monthlyTodoList = [];
   int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadTodoList();
+    if (widget.user != null) {
+      _loadDailyTodoList();
+    } else {
+      print('User is null');
+    }
   }
 
-  Future<void> _loadTodoList() async {
+  // 1. 일별 분석
+  Future<void> _loadDailyTodoList() async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/test.json');
+      DateTime today = DateTime.now();
+      List<Map<String, dynamic>> data = await getTodosByDate(widget.user.displayName!, today);
 
-      if (!await file.exists()) {
-        final data = await rootBundle.loadString('assets/test.json');
-        await file.writeAsString(data);
-      }
-
-      final String response = await file.readAsString();
-      final data = json.decode(response)['user_day_todolist'] as List<dynamic>;
+      // 필수 필드가 있는지 확인하고 없으면 기본값 설정
+      data.forEach((todo) {
+        if (todo['content'] == null || todo['content'].isEmpty) {
+          todo['content'] = 'No content'; // 기본값 설정
+        }
+      });
 
       setState(() {
-        userDayTodoList = data.cast<Map<String, dynamic>>();
+        userDayTodoList = data;
       });
+      print('Daily Todos: $userDayTodoList');
     } catch (e) {
-      print('Error loading JSON: $e');
+      print('Error loading daily todos: $e');
+    }
+  }
+
+  // 2. 주별 분석
+  Future<void> _loadWeeklyTodoList() async {
+    try {
+      DateTime today = DateTime.now();
+      DateTime startDate = today.subtract(Duration(days: today.weekday % 7)); // 현재 주의 일요일을 startDate로 설정
+      DateTime endDate = startDate.add(Duration(days: 6)); // 주의 끝 날짜 설정
+      List<Map<String, dynamic>> data = await getTodosByWeek(widget.user.displayName!, startDate);
+
+      print('Fetched Weekly Todos: $data');
+
+      data.forEach((todo) {
+        if (todo['content'] == null || todo['content'].isEmpty) {
+          todo['content'] = 'No content';
+        }
+      });
+
+      setState(() {
+        weeklyTodoList = data;
+      });
+      print('Processed Weekly Todos: $weeklyTodoList');
+    } catch (e) {
+      print('Error loading weekly todos: $e');
+    }
+  }
+
+  // 3. 월별 분석
+  Future<void> _loadMonthlyTodoList() async {
+    try {
+      DateTime now = DateTime.now();
+      List<Map<String, dynamic>> data = await getTodosByMonth(widget.user.displayName!, now.year, now.month);
+
+      setState(() {
+        monthlyTodoList = data.map((item) {
+          if (item['content'] == null || item['content'].isEmpty) {
+            item['content'] = 'No content'; // 기본값 설정
+          }
+          return item;
+        }).toList();
+      });
+      print('Monthly Todos: $monthlyTodoList');
+    } catch (e) {
+      print('Error loading monthly todos: $e');
     }
   }
 
@@ -67,7 +123,7 @@ class _DashboardPageState extends State<DashboardPage> {
             border: Border.all(color: Colors.white),
             color: Color(0xFF004FA0), // 이전과 동일한 배경색
           ),
-          child: buildWeeklyAnalysis(userDayTodoList),
+          child: buildWeeklyAnalysis(weeklyTodoList),
         );
       case 2:
         return Container(
@@ -99,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   border: Border.all(color: Colors.white),
                   color: Color(0xFF004FA0), // 이전과 동일한 배경색
                 ),
-                child: buildWeeklyAnalysis(userDayTodoList),
+                child: buildWeeklyAnalysis(weeklyTodoList),
               ),
               Container(
                 margin: EdgeInsets.all(10),
@@ -109,7 +165,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   color: Color(0xFF004FA0), // 이전과 동일한 배경색
                 ),
                 child: buildMonthlyAnalysis(),
-              ),//
+              ),
             ],
           ),
         );
@@ -158,10 +214,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ],
               isSelected: [selectedIndex == 0, selectedIndex == 1, selectedIndex == 2, selectedIndex == 3],
-              onPressed: (int index) {
+              onPressed: (int index) async {
                 setState(() {
                   selectedIndex = index;
                 });
+                if (index == 0) {
+                  await _loadDailyTodoList();
+                } else if (index == 1) {
+                  await _loadWeeklyTodoList();
+                } else if (index == 2) {
+                  await _loadMonthlyTodoList();
+                }
               },
             ),
           ),

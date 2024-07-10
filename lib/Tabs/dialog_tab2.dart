@@ -284,7 +284,7 @@ class DialogForTab2 {
                               decorationColor: Colors.black,
                               color: item['type'] == 'Work' ? Colors.red[200] : Colors.blue[200],
                             ),
-                          ),/
+                          ),
                         );//
                       },
                     ),

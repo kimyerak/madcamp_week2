@@ -104,26 +104,34 @@ Future<Map<String, dynamic>> getAllTodos(String name) async {
 
 
 
-Future<List<String>> getTodosByWeek(String name, DateTime startDate) async {
-  final endDate = startDate.add(Duration(days: 6)); // 한 주의 끝 날짜 계산
-  final url = Uri.parse('http://143.248.228.214:3000/users/todobyweek?name=$name&start_date=${startDate.toIso8601String()}&end_date=${endDate.toIso8601String()}');
+
+Future<List<Map<String, dynamic>>> getTodosByWeek(String name, DateTime startDate) async {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final formattedStartDate = formatter.format(startDate);
+  final endDate = startDate.add(Duration(days: 6));
+  final formattedEndDate = formatter.format(endDate);
+
+  final url = Uri.parse('http://143.248.228.214:3000/users/todobyweek?name=$name&start_date=$formattedStartDate&end_date=$formattedEndDate');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     List<dynamic> data = json.decode(response.body);
-    return List<String>.from(data.map((item) => item['content'] as String));
+    print("Server response: $data");
+    return List<Map<String, dynamic>>.from(data.map((item) => item as Map<String, dynamic>));
   } else {
     throw Exception('Failed to load weekly todos');
   }
 }
 
-Future<List<String>> getTodosByMonth(String name, int year, int month) async {
+
+Future<List<Map<String, dynamic>>> getTodosByMonth(String name, int year, int month) async {
   final url = Uri.parse('http://143.248.228.214:3000/users/todobymonth?name=$name&year=$year&month=$month');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     List<dynamic> data = json.decode(response.body);
-    return List<String>.from(data.map((item) => item['content'] as String));
+    return List<Map<String, dynamic>>.from(data.map((item) => item as Map<String, dynamic>));
+
   } else {
     throw Exception('Failed to load monthly todos');
   }

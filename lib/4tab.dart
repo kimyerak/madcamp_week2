@@ -23,7 +23,7 @@ class _MainTabsPageState extends State<MainTabsPage> {
     _widgetOptions = <Widget>[
       FirstTab(user: widget.user),
       SecondTab(user: widget.user),
-      DashboardPage(),
+      DashboardPage(user: widget.user),
       MyPage(user: widget.user), // 사용자 정보를 MyPage에 전달
     ];
   }

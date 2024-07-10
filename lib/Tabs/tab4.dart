@@ -78,10 +78,7 @@ class _MyPageState extends State<MyPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset(
-              'assets/image/default.png',
-              height: 100,
-            ),
+
             if (widget.user.photoUrl != null)
               CircleAvatar(
                 backgroundImage: NetworkImage(widget.user.photoUrl!),
