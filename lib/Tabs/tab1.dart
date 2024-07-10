@@ -219,14 +219,14 @@ class _FirstTabState extends State<FirstTab> {
                 ElevatedButton(
                   onPressed: () => _toggleRecording('ADD Work'),
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFFFD9D9)),
                   ),
                   child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'ADD Work'),
                 ),
                 ElevatedButton(
                   onPressed: () => _toggleRecording('ADD Life'),
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
+                    backgroundColor: MaterialStateProperty.all(Color(0xFFAEDFF7)),
                   ),
                   child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'ADD Life'),
                 ),
@@ -265,7 +265,9 @@ class _FirstTabState extends State<FirstTab> {
                           item['content'],
                           style: TextStyle(
                             decoration: item['complete'] ? TextDecoration.lineThrough : null,
-                            color: item['type'] == 'Work' ? Color(0xFFFFC1C1) : Color(0xFFB0E0E6),
+                            decorationThickness: item['complete'] ? 4.0 : null, // 밑줄 두께 설정
+                            decorationColor: item['complete'] ? Colors.white : null, // 밑줄 색상 설정
+                            color: item['type'] == 'Work' ? Color(0xFFFFD9D9) : Color(0xFFAEDFF7),
                           ),
                         ),
                       ),

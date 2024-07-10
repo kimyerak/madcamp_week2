@@ -229,54 +229,74 @@ class DialogForTab2 {
   final BuildContext context;
   final GoogleSignInAccount user;
 
-
   DialogForTab2({
     required this.context,
     required this.user,
-
   });
 
   void showTodosDialog(List<Map<String, dynamic>> todoList, DateTime day) {
+    int totalTodos = todoList.length;
+    int completedTodos = todoList.where((todo) => todo['complete']).length;
+    double completionRate = totalTodos > 0 ? completedTodos / totalTodos : 0.0;
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('Todo for ${DateFormat('yyyy-MM-dd').format(day)}'),
-              content: Container(
-                width: double.maxFinite,
-                height: 400,
-                child: ListView.builder(
-                  itemCount: todoList.length,
-                  itemBuilder: (context, index) {
-                    final item = todoList[index];
-                    return ListTile(
-                      leading: Checkbox(
-                        value: item['complete'],
-                        onChanged: (value) {
-                          setState(() {
-                            item['complete'] = value;
-                          });
-                          toggleCheck(todoList, index, (updateState) {
-                            setState(() {
-                              todoList[index]['complete'] = value;
-                            });
-                          });
-                        },
-                      ),
-                      title: Text(
-                        item['content'],
-                        style: TextStyle(
-                          decoration: item['complete']
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: item['type'] == 'Work' ? Colors.blue : Colors.green,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              title: Text('         ${DateFormat('yyyy-MM-dd').format(day)}'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.maxFinite,
+                    height: 300,
+                    child: ListView.builder(
+                      itemCount: todoList.length,
+                      itemBuilder: (context, index) {
+                        final item = todoList[index];
+                        return ListTile(
+                          leading: Checkbox(
+                            value: item['complete'],
+                            onChanged: (value) {
+                              setState(() {
+                                item['complete'] = value;
+                                completedTodos = todoList.where((todo) => todo['complete']).length;
+                                completionRate = totalTodos > 0 ? completedTodos / totalTodos : 0.0;
+                              });
+                              toggleCheck(todoList, index, (updateState) {
+                                setState(() {
+                                  todoList[index]['complete'] = value;
+                                });
+                              });
+                            },
+                          ),
+                          title: Text(
+                            item['content'],
+                            style: TextStyle(
+                              decoration: item['complete']
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              decorationThickness: 4.0,
+                              decorationColor: Colors.white,
+                              color: item['type'] == 'Work' ? Colors.red[200] : Colors.blue[200],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text('Progress'),
+                  LinearProgressIndicator(
+                    value: completionRate,
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                  SizedBox(height: 8),
+                  Text('${(completionRate * 100).toStringAsFixed(1)}% Completed'),
+                ],
               ),
               actions: [
                 TextButton(
@@ -326,3 +346,6 @@ class DialogForTab2 {
     }
   }
 }
+
+
+
