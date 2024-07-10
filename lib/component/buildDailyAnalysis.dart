@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 Widget buildDailyAnalysis(List<Map<String, dynamic>> userDayTodoList) {
   final today = DateTime.now();
+  final todayFormatted = DateFormat('yyyy-MM-dd').format(today);
   // 오늘 날짜의 할일 리스트를 가져옵니다.
-  final todayTodos = userDayTodoList.firstWhere(
-        (element) => element['date'] == today.toIso8601String().split('T').first,
-    orElse: () => {'todos': []},
-  )['todos'];
+  final todayTodos = userDayTodoList.where((element) {
+    return element['date'] == todayFormatted;
+  }).toList();
 
   // 오늘의 work와 life 할일 개수를 계산합니다.
-  final workTodosToday = todayTodos.where((todo) => todo['type'] == 'work').length.toDouble();
-  final lifeTodosToday = todayTodos.where((todo) => todo['type'] == 'life').length.toDouble();
+  final workTodosToday = todayTodos.where((todo) => todo['type'] == 'Work').length.toDouble();
+  final lifeTodosToday = todayTodos.where((todo) => todo['type'] == 'Life').length.toDouble();
 
   // 도넛형 차트로 Work/Life 비율을 보여줍니다.
   return Center(
