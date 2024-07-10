@@ -4,16 +4,31 @@ import 'package:madcamp_week2/api/google_signin_api.dart'; // GoogleSigninApi �
 import '4tab.dart'; // 로그인 후 이동할 메인 페이지를 import 합니다.
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_svg/flutter_svg.dart'; // Add this line
 
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends State<SignUpPage> with SingleTickerProviderStateMixin {
   GoogleSignInAccount? _user;
   String _message = '';
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void _login() async {
     final user = await GoogleSigninApi.login();
@@ -126,36 +141,46 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SvgPicture.asset(
-                  'assets/Image/voice-record.svg',
-                  height: 100,
-                  width: 100,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                ElevatedButton.icon(
-                  icon: Image.asset(
-                    'assets/Image/google.png',
-                    height: 24, // 버튼 세로 높이와 이미지 크기를 맞춤
-                    fit: BoxFit.contain,
-                  ),
-                  label: Text('Sign in/up with Google'),
-                  onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                  ),
-                ),
-              ],
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1 + _animationController.value * 0.1,
+                  child: child,
+                );
+              },
+              child: Image.asset(
+                'assets/image/record.png',
+                width: 150, // 적당한 크기로 조정
+                height: 150,
+                fit: BoxFit.contain,
+              ),
             ),
-            SizedBox(
-              height:20,
+            SizedBox(height:50),
+            ElevatedButton(
+              onPressed: _login,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  SizedBox(width: 3), // 간격 조정
+                  Container(
+                    child: Image.asset(
+                      'assets/image/google.png',
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(width: 10), // 간격 조정
+                  Text('Sign in/up with Google'),
+                ],
+              ),
             ),
+            SizedBox(height: 30),
             ElevatedButton(
               onPressed: _navigateToMainTabsPage,
-              child: Text('이미 로그인 했어요'),
+              child: Text('이미 로그인 이력이 있어요!'),
             ),
           ],
         ),

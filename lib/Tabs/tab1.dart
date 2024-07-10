@@ -236,14 +236,14 @@ class _FirstTabState extends State<FirstTab> with SingleTickerProviderStateMixin
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFFFD9D9)),
                   ),
-                  child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'Work'),
+                  child: Text(_isRecording && _currentType == 'ADD Work' ? 'Done' : 'Work'),//타입오류 제발주의...
                 ),
                 ElevatedButton(
                   onPressed: () => _toggleRecording('ADD Life'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFFAEDFF7)),
                   ),
-                  child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'Life'),
+                  child: Text(_isRecording && _currentType == 'ADD Life' ? 'Done' : 'Life'),//여기도
                 ),
               ],
             ),
