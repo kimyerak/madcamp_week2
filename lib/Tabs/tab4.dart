@@ -155,7 +155,7 @@ class _MyPageState extends State<MyPage> {
                           padding: EdgeInsets.all(8.0),
                           child: Text(
                             widget.user.email,
-                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            style: TextStyle(fontSize: 12, color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -187,13 +187,7 @@ class _MyPageState extends State<MyPage> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showRunningMateDialog,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Color(0xFFD9D9D9)),
-              ),
-              child: Text('Change Running Mate'),
-            ),
+
           ],
         ),
       ),

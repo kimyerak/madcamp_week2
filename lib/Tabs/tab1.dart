@@ -186,34 +186,8 @@ class _FirstTabState extends State<FirstTab> with SingleTickerProviderStateMixin
         backgroundColor: Color(0xFF004FA0),
         title: const Text('To-Do-Listener',
             style: TextStyle(fontSize: 25, color: Colors.white)),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0), // 왼쪽으로 패딩 추가
-            child: Container(
-              width: 100.0, // 원하는 가로 길이로 조정
-              height: 30.0, // 원하는 세로 길이로 조정
-              child: ToggleButtons(
-                children: [
-                  Text(
-                    'My',
-                    style: TextStyle(color: _isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
-                  ),
-                  Text(
-                    'Mates',
-                    style: TextStyle(color: !_isMySelected ? Colors.white : Color(0xFFADD8E6)), // 선택된 토글의 글자색을 흰색으로 변경
-                  ),
-                ],
-                isSelected: [_isMySelected, !_isMySelected],
-                onPressed: (index) {
-                  setState(() {
-                    _isMySelected = index == 0;
-                  });
-                },
-                fillColor: Colors.pink, // 선택된 토글의 배경색 설정
-              ),
-            ),
-          ),
-        ],
+
+
       ),
       body: Container(
         color: Color(0xFF004FA0),
