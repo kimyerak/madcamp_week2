@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:text_analysis/text_analysis.dart';
 import 'package:word_cloud/word_cloud.dart';
-import 'package:madcamp_week2/component/buildDailyAnalysis.dart';
 import 'package:madcamp_week2/component/buildweeklyAnalysis.dart';
 import 'package:madcamp_week2/component/buildmonthlyAnalysis.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,6 +10,7 @@ import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:madcamp_week2/api/user_api.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DashboardPage extends StatefulWidget {
   final GoogleSignInAccount user;
@@ -103,6 +103,54 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+
+
+
+//이제 load 함수들 다 끝나고 화면 그리는 로직
+  Widget _buildDailyAnalysis() {
+
+    // 오늘의 work와 life 할일 개수를 계산합니다.
+    final workTodosToday = userDayTodoList.where((todo) => todo['type'] == 'Work').length.toDouble();
+    final lifeTodosToday = userDayTodoList.where((todo) => todo['type'] == 'Life').length.toDouble();
+    // 디버깅용 출력
+    print('Work Todos Today: $workTodosToday');
+    print('Life Todos Today: $lifeTodosToday');
+    // 도넛형 차트로 Work/Life 비율을 보여줍니다.
+    return Center(
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: 20,),
+
+          SizedBox(height: 20,),
+          SizedBox(
+            height: 200,
+            child: PieChart(
+              PieChartData(
+                sections: [
+                  PieChartSectionData(
+                    color: Colors.blue,
+                    value: workTodosToday,
+                    title: 'Work',
+                    radius: 50,
+                  ),
+                  PieChartSectionData(
+                    color: Colors.green,
+                    value: lifeTodosToday,
+                    title: 'Life',
+                    radius: 50,
+                  ),
+
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 40,),
+          Text('오늘의 Work/Life 비율', style: TextStyle(fontSize: 18, color: Colors.white)),
+        ],
+      ),
+    );
+  }
   Widget _buildContent() {
     switch (selectedIndex) {
       case 0:
@@ -110,10 +158,10 @@ class _DashboardPageState extends State<DashboardPage> {
           margin: EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white),
+            // border: Border.all(color: Colors.white),
             color: Color(0xFF004FA0), // 이전과 동일한 배경색
           ),
-          child: buildDailyAnalysis(userDayTodoList),
+          child: _buildDailyAnalysis(),
         );
       case 1:
         return Container(
@@ -146,7 +194,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   border: Border.all(color: Colors.white),
                   color: Color(0xFF004FA0), // 이전과 동일한 배경색
                 ),
-                child: buildDailyAnalysis(userDayTodoList),
+                child: _buildDailyAnalysis(),
               ),
               Container(
                 margin: EdgeInsets.all(10),
@@ -180,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF004FA0),
         title: const Text(
-          'Analyze',
+          'Dashboard',
           style: TextStyle(color: Colors.white),
         ),
       ),
